@@ -1,0 +1,87 @@
+# HELP.md
+HELP.md
+
+# Build outputs
+**/target/
+**/build/
+**/out/
+**/bin/
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/  
+!**/src/test/**/build/
+
+# Maven
+.mvn/
+**/mvnw
+**/mvnw.cmd
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Package Files
+**/*.jar
+**/*.war
+**/*.ear
+**/*.zip
+**/*.tar.gz
+
+# Dependencies (Maven local repository) - ¡NO SUBIR!
+**/.m2/repository/
+
+# Logs
+**/*.log
+**/logs/
+**/log/
+
+### IDE ###
+
+## IntelliJ IDEA ##
+**/.idea/
+**/*.iws
+**/*.iml
+**/*.ipr
+**/out/
+
+## Eclipse ##
+**/.classpath
+**/.factorypath
+**/.project
+**/.settings/
+**/.springBeans
+**/.sts4-cache
+**/.apt_generated
+
+## NetBeans ##
+**/nbproject/private/
+**/nbbuild/
+**/dist/
+**/nbdist/
+**/.nb-gradle/
+
+## VS Code ##
+**/.vscode/
+**/*.code-workspace
+
+## General ##
+**/.DS_Store
+**/Thumbs.db
+**/*.bak
+**/*.tmp
+**/*.temp
+
+# System
+**/system.properties
+
+# Unit test reports
+**/TEST-*.xml
+**/surefire-reports/
+**/failsafe-reports/
+
+# Coverage reports
+**/jacoco.exec
+**/jacoco.data
+**/*.gcov
+**/*.lcov
+
+# Checkstyle reports
+**/checkstyle-output.xml
+**/checkstyle-result.xml
