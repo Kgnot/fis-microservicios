@@ -38,34 +38,35 @@ public class EmailController {
         String role;
         try {
             role = jwtUtil.extractRole(token);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            System.out.println("Rol extraído del token: " + role);
+                if (!"ADMIN".equals(role)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of(
-                            "error", "Token inválido o expirado",
-                            "message", e.getMessage()
-                    ));
-        }
-
-        if (!"ADMIN".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of(
-                            "error", "Acceso denegado",
-                            "message", "Se requiere rol ADMIN para enviar correos"
-                    ));
-        }
-
-        EmailResponse response = emailRequest.isHtml()
-                ? emailService.sendHtmlEmail(emailRequest)
-                : emailService.sendEmail(emailRequest);
-
-        HttpStatus status = response.isSuccess() ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
-        return ResponseEntity.status(status).body(response);
-    }
-
-    @GetMapping("/logs")
-    public ResponseEntity<List<EmailLog>> getAllLogs() {
-        return ResponseEntity.ok(emailService.getAllEmailLogs());
-    }
+                        "error", "Acceso denegado",
+                        "message", "Se requiere rol ADMIN para enviar correos"
+                        ));
+                    }
+                
+                    
+                    EmailResponse response = emailRequest.isHtml()
+                    ? emailService.sendHtmlEmail(emailRequest)
+                    : emailService.sendEmail(emailRequest);
+                    
+                    HttpStatus status = response.isSuccess() ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
+                    return ResponseEntity.status(status).body(response);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Map.of(
+                                    "error", "Token inválido o expirado",
+                                    "message", e.getMessage()
+                            ));
+                }
+            }
+            
+            @GetMapping("/logs")
+            public ResponseEntity<List<EmailLog>> getAllLogs() {
+                return ResponseEntity.ok(emailService.getAllEmailLogs());
+            }
 
     @GetMapping("/logs/recipient/{recipient}")
     public ResponseEntity<List<EmailLog>> getLogsByRecipient(@PathVariable String recipient) {

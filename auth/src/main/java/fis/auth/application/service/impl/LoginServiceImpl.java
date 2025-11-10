@@ -1,6 +1,8 @@
 package fis.auth.application.service.impl;
 
 
+import org.springframework.stereotype.Service;
+
 import fis.auth.application.command.TokenCommand;
 import fis.auth.application.command.impl.GenerateTokenCommand;
 import fis.auth.application.repository.UserMSRepository;
@@ -10,7 +12,6 @@ import fis.auth.domain.model.Login;
 import fis.auth.domain.model.Token;
 import fis.auth.domain.model.TokenRequest;
 import fis.auth.domain.service.EncryptStrategy;
-import org.springframework.stereotype.Service;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -28,7 +29,6 @@ public class LoginServiceImpl implements LoginService {
         this.repository = repository;
         this.encrypt = encrypt;
     }
-    // cambio para subir la rama
     @Override
     public Token execute(Login login) {
         //Primer paso es encriptar, luego buscar para comparar
