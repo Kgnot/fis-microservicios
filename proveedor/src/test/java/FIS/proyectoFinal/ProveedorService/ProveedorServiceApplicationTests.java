@@ -1,10 +1,10 @@
-package uni.fis.proveedor;
+package FIS.proyectoFinal.ProveedorService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ProveedorApplicationTests {
+class ProveedorServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

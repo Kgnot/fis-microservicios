@@ -1,13 +1,13 @@
-package uni.fis.proveedor;
+package FIS.proyectoFinal.ProveedorService;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ProveedorApplication {
+public class ProveedorServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProveedorApplication.class, args);
+		SpringApplication.run(ProveedorServiceApplication.class, args);
 	}
 
 }
