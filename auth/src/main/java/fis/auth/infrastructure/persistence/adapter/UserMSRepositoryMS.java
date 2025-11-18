@@ -21,7 +21,7 @@ public class UserMSRepositoryMS implements UserMSRepository {
     public TokenRequest findNameAndRolUser(String name, String password) {
         //necesitamos el nombre y el rol entonces,
         return restTemplate.getForObject(
-                UserEndpoint.GET_USER_VALIDATE.getEndpoint(),
+                UserEndpoint.POST_USER_VALIDATE.getEndpoint(),
                 TokenRequest.class);
     }
 
