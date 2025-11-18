@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean save(UserRequest user) {
+    public UserDto save(UserRequest user) {
         if (userRepository.existsByEmail(user.email())) {
             throw new RuntimeException("El email ya está registrado");
         }
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
                     userCreated.getId()
             );
             passwordRepository.save(entityPassword);
-            return true;
+            return UserMapper.entityToDto(entity);
 
         } catch (DataIntegrityViolationException e) {
             // Resetear secuencia si hay conflicto
@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
                     userCreated.getId()
             );
             passwordRepository.save(entityPassword);
-            return true;
+            return UserMapper.entityToDto(entity);
         }
     }
 

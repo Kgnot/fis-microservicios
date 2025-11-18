@@ -12,6 +12,6 @@ public interface UserService {
 
     Optional<UserDto> findById(int id);
 
-    boolean save(UserRequest user);
+    UserDto save(UserRequest user);
 
 }
