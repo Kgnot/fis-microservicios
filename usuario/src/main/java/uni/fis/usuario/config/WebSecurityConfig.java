@@ -30,12 +30,13 @@ public class WebSecurityConfig {
     @Order(1)
     public SecurityFilterChain jwtSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/v1/jwt/**")  // ← Endpoints que usan JWT
+                .securityMatcher("/usuario/api/v1/jwt/**", "/api/v1/jwt/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
@@ -46,7 +47,7 @@ public class WebSecurityConfig {
     @Order(2)
     public SecurityFilterChain basicAuthSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/v1/users/auth/verify")  // ← Este endpoint usa Basic Auth
+                .securityMatcher("/api/v1/validate/**","/usuario/api/v1/validate/**")  // ← Este endpoint usa Basic Auth
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated()
