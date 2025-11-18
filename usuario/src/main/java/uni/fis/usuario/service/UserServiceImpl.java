@@ -84,9 +84,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public Optional<UserDto> findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(UserMapper::entityToDto);
+    }
+
     private void resetSequence() {
         Query query = entityManager.createNativeQuery(
-                "SELECT setval('usuario_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM usuario))"
+                "SELECT setval('usuario_id_seq', (SELECT COALESCE(MAX(email), 0) + 1 FROM usuario))"
         );
         query.getSingleResult();
     }

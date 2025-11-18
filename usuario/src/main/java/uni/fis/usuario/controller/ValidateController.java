@@ -1,6 +1,5 @@
 package uni.fis.usuario.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -22,9 +21,10 @@ public class ValidateController {
 
     @PostMapping("/auth/verify")
     public ResponseEntity<ApiResponse<TokenResponse>> validateUser(@RequestBody UserValidateRequest userValidateRequest) {
-        var validate = passwordService.validate(userValidateRequest.id(), userValidateRequest.password());
+        var validate = passwordService.validate(userValidateRequest.email(), userValidateRequest.password());
         if (validate) {
-            var user = userService.findById(userValidateRequest.id());
+            var user = userService.findByEmail(userValidateRequest.email());
+
             return user.map(userDto -> ResponseEntity.ok(
                     ApiResponse.success("Usuario verificado",
                             new TokenResponse(
@@ -36,7 +36,6 @@ public class ValidateController {
                     .of(ProblemDetail.forStatus(403))
                     .build());
         }
-        return new ResponseEntity<>(HttpStatusCode.valueOf(403));
+        return new ResponseEntity<>(ApiResponse.error("No se encontró el usuario", 403), HttpStatusCode.valueOf(403));
     }
-
 }

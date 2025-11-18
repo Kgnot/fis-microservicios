@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import uni.fis.usuario.config.auth.JwtAuthenticationFilter;
 
 @Configuration
@@ -25,9 +24,25 @@ public class WebSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // FilterChain para endpoints JWT
+    // FilterChain para endpoints Basic Auth - ORDEN 1 (más específico)
     @Bean
     @Order(1)
+    public SecurityFilterChain basicAuthSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/v1/validate/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().authenticated()  // ← Cambia a esto
+                )
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        return http.build();
+    }
+
+    // FilterChain para endpoints JWT - ORDEN 2
+    @Bean
+    @Order(2)
     public SecurityFilterChain jwtSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/usuario/api/v1/jwt/**", "/api/v1/jwt/**")
@@ -42,28 +57,12 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-    // FilterChain para endpoints Basic Auth
-    @Bean
-    @Order(2)
-    public SecurityFilterChain basicAuthSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/api/v1/validate/**","/usuario/api/v1/validate/**")  // ← Este endpoint usa Basic Auth
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        return http.build();
-    }
-
-    // FilterChain para endpoints públicos
+    // FilterChain para endpoints públicos - ORDEN 3 (más general)
     @Bean
     @Order(3)
     public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/**")  // ← Todos los demás endpoints
+                .securityMatcher("/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()

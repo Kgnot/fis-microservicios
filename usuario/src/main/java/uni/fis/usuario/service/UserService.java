@@ -14,4 +14,6 @@ public interface UserService {
 
     UserDto save(UserRequest user);
 
+    Optional<UserDto> findByEmail(String email);
+
 }
