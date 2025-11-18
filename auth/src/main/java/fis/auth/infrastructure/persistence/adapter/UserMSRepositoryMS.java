@@ -6,6 +6,10 @@ import fis.auth.domain.model.TokenRequest;
 import fis.auth.infrastructure.dto.response.api.ApiResponse;
 import fis.auth.infrastructure.endpoints.UserEndpoint;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,6 +22,7 @@ public class UserMSRepositoryMS implements UserMSRepository {
         this.restTemplate = restTemplate;
     }
 
+    //TODO: Toca hacer algo similar a register user aqui en findNameAndRolUser
     @Override
     public TokenRequest findNameAndRolUser(String name, String password) {
         //necesitamos el nombre y el rol entonces,
@@ -29,12 +34,17 @@ public class UserMSRepositoryMS implements UserMSRepository {
     @Override
     public TokenRequest registerUser(SignIn signIn) {
         //aqui registramos y esperamos el TokenRequest de parte del usuario
-        ApiResponse<?> response = restTemplate.postForObject(
+        ResponseEntity<ApiResponse<TokenRequest>> response = restTemplate.exchange(
                 UserEndpoint.POST_USER_CREATE.getEndpoint(),
-                signIn,
-                ApiResponse.class
+                HttpMethod.POST,
+                new HttpEntity<>(signIn),
+                new ParameterizedTypeReference<ApiResponse<TokenRequest>>() {
+                }
         );
-        assert response != null;
-        return (TokenRequest) response.getData(); //
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            TokenRequest tokenResponse = response.getBody().getData();
+            return new TokenRequest(tokenResponse.userId(), tokenResponse.rolId());
+        }
+        return null;
     }
 }
