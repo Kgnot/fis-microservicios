@@ -12,6 +12,18 @@ public class AuthMapper {
     }
 
     public static SignIn toDomain(SignInRequest signInRequest) {
-        return new SignIn(signInRequest.username(), signInRequest.email(), signInRequest.password());
+        return new SignIn(
+                signInRequest.name(),
+                signInRequest.apellido1(),
+                signInRequest.apellido2(),
+                signInRequest.fechaNacimiento(),
+                signInRequest.documento(),
+                signInRequest.imgPerfil(), // Si puede ser null
+                signInRequest.email(),
+                signInRequest.strikes() != null ? signInRequest.strikes() : 0, // Default 0
+                signInRequest.idRol(),
+                signInRequest.idMultimedia(), // Si puede ser null
+                signInRequest.password()
+        );
     }
 }
