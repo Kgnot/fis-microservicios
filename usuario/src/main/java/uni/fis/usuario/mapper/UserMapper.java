@@ -45,7 +45,7 @@ public class UserMapper {
 
     public static UserEntity requestToEntity(UserRequest userRequest){
         return new UserEntity(
-                null, // id - se genera automáticamente
+                null, // email - se genera automáticamente
                 userRequest.name(),
                 userRequest.apellido1(),
                 userRequest.apellido2(),
