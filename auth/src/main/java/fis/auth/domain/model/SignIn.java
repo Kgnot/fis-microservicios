@@ -4,13 +4,29 @@ public record SignIn(
         String name,
         String apellido1,
         String apellido2,
-        String fechaNacimiento, // esta debe ser año-mes-dia | debe ser enviado como LocalDate
+        String fechaNacimiento,
         String documento,
-        Integer imgPerfil, // porque numero?
+        Integer imgPerfil,
         String email,
-        Integer strikes, // por defecto 0 al crear
+        Integer strikes,
         Integer idRol,
-        Integer idMultimedia,// que diferencia hay con el img
-        String password // Aqui la contraseña ya viene codificada jeje [no se que tan seguro es eso]
+        Integer idMultimedia,
+        String password
 ) {
+
+    public SignIn withPassword(String newPassword) {
+        return new SignIn(
+                this.name,
+                this.apellido1,
+                this.apellido2,
+                this.fechaNacimiento,
+                this.documento,
+                this.imgPerfil,
+                this.email,
+                this.strikes,
+                this.idRol,
+                this.idMultimedia,
+                newPassword
+        );
+    }
 }

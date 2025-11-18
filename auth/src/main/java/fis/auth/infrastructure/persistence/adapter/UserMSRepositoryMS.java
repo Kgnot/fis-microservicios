@@ -3,6 +3,7 @@ package fis.auth.infrastructure.persistence.adapter;
 import fis.auth.application.repository.UserMSRepository;
 import fis.auth.domain.model.SignIn;
 import fis.auth.domain.model.TokenRequest;
+import fis.auth.infrastructure.dto.request.UserValidateRequest;
 import fis.auth.infrastructure.dto.response.api.ApiResponse;
 import fis.auth.infrastructure.endpoints.UserEndpoint;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,11 +25,20 @@ public class UserMSRepositoryMS implements UserMSRepository {
 
     //TODO: Toca hacer algo similar a register user aqui en findNameAndRolUser
     @Override
-    public TokenRequest findNameAndRolUser(String name, String password) {
+    public TokenRequest findNameAndRolUser(String email, String password) {
         //necesitamos el nombre y el rol entonces,
-        return restTemplate.getForObject(
-                UserEndpoint.POST_USER_VALIDATE.getEndpoint(),
-                TokenRequest.class);
+        ResponseEntity<ApiResponse<TokenRequest>> response = restTemplate
+                .exchange(UserEndpoint.POST_USER_VALIDATE.getEndpoint(),
+                        HttpMethod.POST,
+                        new HttpEntity<>(new UserValidateRequest(email, password)),
+                        new ParameterizedTypeReference<>(){});
+
+        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+            assert response.getBody() != null;
+            return response.getBody().getData();
+        }
+
+        return null;
     }
 
     @Override
@@ -38,7 +48,7 @@ public class UserMSRepositoryMS implements UserMSRepository {
                 UserEndpoint.POST_USER_CREATE.getEndpoint(),
                 HttpMethod.POST,
                 new HttpEntity<>(signIn),
-                new ParameterizedTypeReference<ApiResponse<TokenRequest>>() {
+                new ParameterizedTypeReference<>() {
                 }
         );
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
