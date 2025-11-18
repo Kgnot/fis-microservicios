@@ -2,6 +2,7 @@ package uni.fis.usuario.service;
 
 import org.springframework.stereotype.Service;
 import uni.fis.usuario.dto.UserDto;
+import uni.fis.usuario.dto.request.UserRequest;
 import uni.fis.usuario.entity.UserEntity;
 import uni.fis.usuario.mapper.UserMapper;
 import uni.fis.usuario.repository.UserRepository;
@@ -35,12 +36,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean save(UserDto user) {
-        UserEntity entity = UserMapper.dtoToEntity(user);
+    public boolean save(UserRequest user) {
+        UserEntity entity = UserMapper.requestToEntity(user);
         repository.save(entity);
         return true;
     }
-
 
 
 
