@@ -88,6 +88,10 @@ public class JWTTokenStrategy implements TokenStrategy {
                 .getPayload();
     }
 
+    public Claims internalClaims(String token) {
+        return getAllClaims(token); // sigue siendo private internamente
+    }
+
     private <T> Optional<T> getClaim(String token, Function<Claims, T> claimResolver) {
         try {
             final Claims claims = getAllClaims(token);
