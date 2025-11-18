@@ -15,7 +15,7 @@ services:
       DATABASE_URL: jdbc:postgresql://ep-polished-cherry-ah1a56yk-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require
       DATABASE_USERNAME: neondb_owner
       DATABASE_PASSWORD: npg_DIVZBu65hQzb
-      SECRET_KEY: tu_clave_secreta_aqui
+      SECRET_KEY: qCgc0FE5I486aCvaA0LC/7Z91USA6SNqHZ8qmqyUNoT809d0AP4qJ9CazVaW9uLr
     networks:
       - fis-network
 
@@ -29,7 +29,7 @@ services:
       DATABASE_URL: jdbc:postgresql://ep-polished-cherry-ah1a56yk-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require
       DATABASE_USERNAME: neondb_owner
       DATABASE_PASSWORD: npg_DIVZBu65hQzb
-      SECRET_KEY: tu_clave_secreta_aqui
+      SECRET_KEY: qCgc0FE5I486aCvaA0LC/7Z91USA6SNqHZ8qmqyUNoT809d0AP4qJ9CazVaW9uLr
     networks:
       - fis-network
 
