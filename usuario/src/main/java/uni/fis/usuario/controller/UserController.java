@@ -2,12 +2,12 @@ package uni.fis.usuario.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uni.fis.usuario.dto.UserDto;
 import uni.fis.usuario.dto.request.UserRequest;
 import uni.fis.usuario.dto.response.ApiResponse;
+import uni.fis.usuario.dto.response.TokenResponse;
 import uni.fis.usuario.dto.response.UserResponse;
 import uni.fis.usuario.mapper.UserMapper;
 import uni.fis.usuario.service.UserService;
@@ -52,12 +52,11 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseEntity<ApiResponse<?>> create(@RequestBody UserRequest request) {
-        return userService.save(request) ?
-                ResponseEntity.ok(ApiResponse.success("Usuario creado exitosamente")) :
-                new ResponseEntity<>(
-                        ApiResponse.error("Error al crear un usuario", 405),
-                        HttpStatusCode.valueOf(405));
+    public ResponseEntity<ApiResponse<TokenResponse>> create(@RequestBody UserRequest request) {
+        UserDto userDto = userService.save(request);
+
+        return ResponseEntity.ok(ApiResponse.success("Usuario creado exitosamente",
+                new TokenResponse(userDto.id(), userDto.idRol())));
     }
 
 }
