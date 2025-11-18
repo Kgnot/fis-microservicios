@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface PasswordRepository extends JpaRepository<PasswordEntity, Long> {
 
-    @Query("SELECT p FROM PasswordEntity p WHERE p.idUsuario = :idUsuario AND p.fecha = (SELECT MAX(p2.fecha) FROM PasswordEntity p2 WHERE p2.idUsuario = :idUsuario)")
-    Optional<PasswordEntity> findMasRecienteByIdUsuario(@Param("idUsuario") Integer idUsuario);
+    @Query("SELECT p FROM PasswordEntity p WHERE p.idUsuario = :idUsuario ORDER BY p.fecha DESC LIMIT 1")
+    Optional<PasswordEntity> findMasRecienteById(@Param("idUsuario") Integer idUsuario);
 }
