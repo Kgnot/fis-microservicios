@@ -1,12 +1,12 @@
 package fis.auth.infrastructure.endpoints;
 
 public enum UserEndpoint {
-    GET_USER_VALIDATE("/api/v1/users/validate"),
+    POST_USER_VALIDATE("/api/v1/users/auth/verify"),
     POST_USER_CREATE("/api/v1/users");
 
     private final String endpoint;
 
-    private UserEndpoint(String endpoint) {
+    UserEndpoint(String endpoint) {
         this.endpoint = endpoint;
     }
 
