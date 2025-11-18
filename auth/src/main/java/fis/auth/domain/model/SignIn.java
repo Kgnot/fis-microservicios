@@ -1,9 +1,16 @@
 package fis.auth.domain.model;
 
 public record SignIn(
-        //no se que cosas se requieren en el sign in xd
         String name,
+        String apellido1,
+        String apellido2,
+        String fechaNacimiento, // esta debe ser año-mes-dia | debe ser enviado como LocalDate
+        String documento,
+        Integer imgPerfil, // porque numero?
         String email,
-        String password
+        Integer strikes, // por defecto 0 al crear
+        Integer idRol,
+        Integer idMultimedia,// que diferencia hay con el img
+        String password // Aqui la contraseña ya viene codificada jeje [no se que tan seguro es eso]
 ) {
 }
