@@ -8,7 +8,7 @@ import fis.auth.infrastructure.dto.request.SignInRequest;
 public class AuthMapper {
 
     public static Login toDomain(LoginRequest loginRequest) {
-        return new Login(loginRequest.name(), loginRequest.password());
+        return new Login(loginRequest.email(), loginRequest.password());
     }
 
     public static SignIn toDomain(SignInRequest signInRequest) {
