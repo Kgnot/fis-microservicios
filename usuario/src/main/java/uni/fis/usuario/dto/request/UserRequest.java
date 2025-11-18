@@ -10,6 +10,7 @@ public record UserRequest (
         String email,
         Integer strikes, // por defecto 0 al crear
         Integer idRol,
-        Integer idMultimedia // que diferencia hay con el img
+        Integer idMultimedia,// que diferencia hay con el img
+        String password // Aqui la contraseña ya viene codificada jeje [no se que tan seguro es eso]
 ){
 }
