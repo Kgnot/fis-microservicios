@@ -39,10 +39,10 @@ public class JWTTokenStrategy implements TokenStrategy {
     @Override
     public Token generate(TokenRequest tokenRequest) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", tokenRequest.rol());
+        claims.put("role", tokenRequest.rolId()); // TODO - hay que buscar aqui el token
 
-        String accessToken = generateToken(claims, tokenRequest.name(), jwtExpiration);
-        String refreshToken = generateToken(claims, tokenRequest.name(), refreshTokenExpiration);
+        String accessToken = generateToken(claims, tokenRequest.userId(), jwtExpiration); // Usaremos el id que es único
+        String refreshToken = generateToken(claims, tokenRequest.userId(), refreshTokenExpiration);
         Instant expiration = Instant.now().plusSeconds(jwtExpiration);
         return new Token(accessToken, refreshToken, expiration, true);
     }
@@ -67,10 +67,10 @@ public class JWTTokenStrategy implements TokenStrategy {
     }
 
     // Métodos privados:
-    private String generateToken(Map<String, Object> extraClaims, String subject, Long expiration) {
+    private String generateToken(Map<String, Object> extraClaims, Integer subject, Long expiration) {
         return Jwts.builder()
                 .claims(extraClaims)
-                .subject(subject)
+                .subject(subject.toString()) // lo pondremos en string porque es necesairo pero al ser el único
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getKey())
@@ -86,6 +86,10 @@ public class JWTTokenStrategy implements TokenStrategy {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public Claims internalClaims(String token) {
+        return getAllClaims(token); // sigue siendo private internamente
     }
 
     private <T> Optional<T> getClaim(String token, Function<Claims, T> claimResolver) {

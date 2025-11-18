@@ -15,7 +15,7 @@ public class RestConfiguration {
     @Bean
     @Qualifier("user-ms")
     public RestTemplate getRestTemplateUserMs(RestTemplateBuilder builder) {
-        String baseUrl = "";
+        String baseUrl = "http://fis-usuario:8093";
         return builder
                 .rootUri(baseUrl)
                 .connectTimeout(Duration.ofSeconds(10))
