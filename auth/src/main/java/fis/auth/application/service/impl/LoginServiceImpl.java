@@ -34,7 +34,7 @@ public class LoginServiceImpl implements LoginService {
         //Primer paso es encriptar, luego buscar para comparar
         String passwordEncrypted = encrypt.encrypt(login.password());
         //Obtenemos el TokenRequest, es decir, el nombre y rol desde el microservicio de usuario
-        TokenRequest req = repository.findNameAndRolUser(login.name(), passwordEncrypted);
+        TokenRequest req = repository.findNameAndRolUser(login.email(), passwordEncrypted);
         // Luego generamos el token.
         TokenCommand tokenCommand = new GenerateTokenCommand(this.tokenService, req);
 
