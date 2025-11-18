@@ -5,33 +5,17 @@ networks:
     driver: bridge
 
 services:
-  postgres:
-    image: postgres:15
-    container_name: fis-postgres
-    environment:
-      POSTGRES_DB: fis
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-    ports:
-      - "5432:5432"
-    networks:
-      - fis-network
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
   auth:
     build: ./auth
     container_name: fis-auth
     ports:
       - "8080:8080"
     environment:
-      SERVER_PORT: 8080  # ← AQUÍ
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fis
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 1234
-      SECRET_KEY: tu_clave_secreta_aqui  # ← AQUÍ
-    depends_on:
-      - postgres
+      SERVER_PORT: 8080
+      DATABASE_URL: jdbc:postgresql://ep-polished-cherry-ah1a56yk-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require
+      DATABASE_USERNAME: neondb_owner
+      DATABASE_PASSWORD: npg_DIVZBu65hQzb
+      SECRET_KEY: tu_clave_secreta_aqui
     networks:
       - fis-network
 
@@ -41,13 +25,11 @@ services:
     ports:
       - "8093:8093"
     environment:
-      SERVER_PORT: 8093  # ← AQUÍ
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fis
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 1234
-      SECRET_KEY: tu_clave_secreta_aqui  # ← AQUÍ
-    depends_on:
-      - postgres
+      SERVER_PORT: 8093
+      DATABASE_URL: jdbc:postgresql://ep-polished-cherry-ah1a56yk-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require
+      DATABASE_USERNAME: neondb_owner
+      DATABASE_PASSWORD: npg_DIVZBu65hQzb
+      SECRET_KEY: tu_clave_secreta_aqui
     networks:
       - fis-network
 
@@ -63,6 +45,3 @@ services:
       - usuario
     networks:
       - fis-network
-
-volumes:
-  postgres_data:
