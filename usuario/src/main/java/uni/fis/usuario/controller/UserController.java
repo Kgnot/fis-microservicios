@@ -24,7 +24,6 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity<ApiResponse<List<UserResponse>>> findAll() {
         List<UserDto> userDto = userService.findAll();
-        System.out.println("xd hola: " + userDto);
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Usuarios encontrados",
@@ -35,10 +34,8 @@ public class UserController {
         );
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> findById(@PathVariable Integer id) {
-
         return userService.findById(id)
                 .map(userDto -> ResponseEntity.ok(
                         ApiResponse.success(
@@ -47,16 +44,20 @@ public class UserController {
                         )
                 ))
                 .orElseGet(() -> ResponseEntity.status(404).body(
-                        ApiResponse.error("Usuario no encontrado", 402)
+                        ApiResponse.error("Usuario no encontrado", 404) // ← 404 en lugar de 402
                 ));
     }
 
     @PostMapping()
     public ResponseEntity<ApiResponse<TokenResponse>> create(@RequestBody UserRequest request) {
-        UserDto userDto = userService.save(request);
-
-        return ResponseEntity.ok(ApiResponse.success("Usuario creado exitosamente",
-                new TokenResponse(userDto.id(), userDto.idRol())));
+        try {
+            UserDto userDto = userService.save(request);
+            return ResponseEntity.ok(ApiResponse.success("Usuario creado exitosamente",
+                    new TokenResponse(userDto.id(), userDto.idRol())));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body( // ← 400 para errores de validación
+                    ApiResponse.error("Error al crear usuario: " + e.getMessage(), 400)
+            );
+        }
     }
-
 }
