@@ -1,21 +1,22 @@
 package uni.fis.email.service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uni.fis.email.dto.EmailRequest;
 import uni.fis.email.dto.EmailResponse;
 import uni.fis.email.entity.EmailLog;
 import uni.fis.email.repository.EmailLogRepository;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -126,7 +127,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public List<EmailLog> getEmailLogsByRecipient(String recipient) {
-        return emailLogRepository.findByRecipient(recipient);
+        return emailLogRepository.findByRecipiente(recipient);
     }
 
     @Override
