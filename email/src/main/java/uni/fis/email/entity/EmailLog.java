@@ -27,7 +27,7 @@ public class EmailLog {
     private Integer id;
 
     @Column(name = "id_usuario_receptor")
-    private Integer id_usuario_receptor;
+    private Integer userId;
 
     @Column(nullable = false)
     private String recipiente;
