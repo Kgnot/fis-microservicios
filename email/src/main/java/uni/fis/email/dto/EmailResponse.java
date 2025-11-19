@@ -15,6 +15,6 @@ public class EmailResponse {
     
     private boolean success;
     private String message;
-    private Long logId;
+    private Integer logId;
     private LocalDateTime timestamp;
 }

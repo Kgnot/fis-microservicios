@@ -29,8 +29,8 @@ public class EmailServiceImpl implements EmailService {
     @Transactional
     public EmailResponse sendEmail(EmailRequest emailRequest) {
         EmailLog emailLog = EmailLog.builder()
-                .userId(emailRequest.getUserId())
-                .recipient(emailRequest.getTo())
+                .id_usuario_receptor(emailRequest.getUserId())
+                .recipiente(emailRequest.getTo())
                 .subject(emailRequest.getSubject())
                 .body(emailRequest.getBody())
                 .build();
@@ -75,8 +75,8 @@ public class EmailServiceImpl implements EmailService {
     @Transactional
     public EmailResponse sendHtmlEmail(EmailRequest emailRequest) {
         EmailLog emailLog = EmailLog.builder()
-                .userId(emailRequest.getUserId())
-                .recipient(emailRequest.getTo())
+                .id_usuario_receptor(emailRequest.getUserId())
+                .recipiente(emailRequest.getTo())
                 .subject(emailRequest.getSubject())
                 .body(emailRequest.getBody())
                 .build();
