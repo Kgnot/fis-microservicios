@@ -30,7 +30,7 @@ public class EmailServiceImpl implements EmailService {
     @Transactional
     public EmailResponse sendEmail(EmailRequest emailRequest) {
         EmailLog emailLog = EmailLog.builder()
-                .id_usuario_receptor(emailRequest.getUserId())
+                .userId(emailRequest.getUserId())
                 .recipiente(emailRequest.getTo())
                 .subject(emailRequest.getSubject())
                 .body(emailRequest.getBody())
@@ -76,7 +76,7 @@ public class EmailServiceImpl implements EmailService {
     @Transactional
     public EmailResponse sendHtmlEmail(EmailRequest emailRequest) {
         EmailLog emailLog = EmailLog.builder()
-                .id_usuario_receptor(emailRequest.getUserId())
+                .userId(emailRequest.getUserId())
                 .recipiente(emailRequest.getTo())
                 .subject(emailRequest.getSubject())
                 .body(emailRequest.getBody())
