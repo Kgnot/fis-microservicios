@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "email_logs")
+@Table(name = "mensaje_correo")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,13 +24,13 @@ public class EmailLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "id_usuario_receptor")
+    private Integer id_usuario_receptor;
 
     @Column(nullable = false)
-    private String recipient;
+    private String recipiente;
 
     @Column(nullable = false)
     private String subject;
@@ -38,13 +38,13 @@ public class EmailLog {
     @Column(columnDefinition = "TEXT")
     private String body;
 
-    @Column(nullable = false)
+    @Column(name = "estado", nullable = false)
     private String status; // SENT, FAILED
 
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
-    @Column(name = "sent_at", nullable = false)
+    @Column(name = "fecha", nullable = false)
     private LocalDateTime sentAt;
 
     @PrePersist

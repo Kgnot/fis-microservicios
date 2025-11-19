@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EmailRequest {
     
-    private Long userId;
+    private Integer userId; 
     private String to;
     private String subject;
     private String body;
