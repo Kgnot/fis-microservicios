@@ -1,6 +1,7 @@
 package uni.fis.pago.Entity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,20 +18,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+
 @Entity
-@Table(name = "orden_item")
-public class OrdenItem{
+@Table(name = "orden_compra")
+public class OrdenCompra {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
     @Column()
-    private Integer id_item;
-    @Column()
-    private Integer cantidad;
-    @Column()
-    private BigDecimal valor_unitario;
-    @Column()
-    private BigDecimal subtotal;
-    @Column()
-    private Integer id_orden_compra;
+    private Date fecha;
+    @Column 
+    private BigDecimal total;
+    @Column 
+    private Integer id_pago;
 }
