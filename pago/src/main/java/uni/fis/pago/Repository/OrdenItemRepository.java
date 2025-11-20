@@ -5,7 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import uni.fis.pago.Entity.OrdenItem;
 
+import java.util.List;
+
 @Repository
 public interface OrdenItemRepository extends JpaRepository<OrdenItem, Integer> {
-    OrdenItem findById_orden_compra(Integer idOrdenCompra);
+    List<OrdenItem> findById_orden_compra(Integer idOrdenCompra);
 }
