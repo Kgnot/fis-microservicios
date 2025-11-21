@@ -9,6 +9,6 @@ import uni.fis.pago.Entity.OrdenItem;
 
 @Repository
 public interface OrdenItemRepository extends JpaRepository<OrdenItem, Integer> {
-    List<OrdenItem> findById_orden_compra(Integer idOrdenCompra);
-    boolean existsById_orden_compra(Integer idOrdenCompra);
+    List<OrdenItem> findByIdOrdenCompra(Integer idOrdenCompra);
+    boolean existsByIdOrdenCompra(Integer idOrdenCompra);
 }

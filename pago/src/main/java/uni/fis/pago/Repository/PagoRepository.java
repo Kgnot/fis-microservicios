@@ -7,5 +7,5 @@ import uni.fis.pago.Entity.Pago;
 
 @Repository
 public interface PagoRepository extends JpaRepository<Pago, Integer> {
-    Pago findById_usuario(Integer idUsuario);
+    Pago findByIdUsuario(Integer idUsuario);
 }

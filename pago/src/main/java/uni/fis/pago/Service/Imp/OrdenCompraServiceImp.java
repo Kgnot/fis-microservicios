@@ -64,10 +64,10 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
     @Override
     public List<OrdenItemResponse> consultarOrdenesItems(Integer idOrdenCompra){
         log.info("Buscando ordenes de items que pertenecen a la orden de compra");
-        if (!ordenItemRepository.existsById_orden_compra(idOrdenCompra)) {
+        if (!ordenItemRepository.existsByIdOrdenCompra(idOrdenCompra)) {
             throw new Exceptions("No se han encontrado ordenes de item relacionadas con la orden de compra","ORDEN_ITEM_NOT_FOUND");
         }    
-        List<OrdenItem> ordenesItems = ordenItemRepository.findById_orden_compra(idOrdenCompra);
+        List<OrdenItem> ordenesItems = ordenItemRepository.findByIdOrdenCompra(idOrdenCompra);
         List<OrdenItemResponse> response = new ArrayList<>();
         for(OrdenItem ordenItem : ordenesItems){
             OrdenItemResponse ordenItemResponse = OrdenItemResponse.builder()

@@ -31,7 +31,7 @@ public class Pago {
     @Column()
     private BigDecimal monto_total;
     @Column()
-    private Integer id_usuario;
+    private Integer idUsuario;
     @Column()
-    private Integer id_metodo_pago;
+    private Integer idMetodoPago;
 }
