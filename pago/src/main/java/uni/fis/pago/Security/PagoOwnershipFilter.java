@@ -1,6 +1,7 @@
 package uni.fis.pago.Security;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uni.fis.pago.Entity.OrdenCompra;
+import uni.fis.pago.Entity.OrdenItem;
+import uni.fis.pago.Entity.Pago;
 import uni.fis.pago.Repository.OrdenCompraRepository;
 import uni.fis.pago.Repository.OrdenItemRepository;
 import uni.fis.pago.Repository.PagoRepository;
@@ -35,44 +39,35 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
         
-        log.info("=== OWNERSHIP FILTER === Path: {}, Method: {}", path, method);
-        
-        // Endpoints que NO requieren verificación de ownership (son creaciones)
-        if ((method.equals("POST") && path.equals("/api/pago/crearPago")) ||
-            (method.equals("POST") && path.equals("/api/pago/crearOrdenCompra")) ||
-            (method.equals("POST") && path.equals("/api/pago/crearOrdenItem"))) {
-            log.info("Endpoint de creación, no requiere verificación de ownership");
+        // 1. EXCEPCIÓN: Solo permitir 'crearPago' sin validar ownership previo (aún no tiene ID)
+        if (method.equals("POST") && path.endsWith("/api/pago/crearPago")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Endpoints que SÍ requieren verificación de ownership
-        boolean requiresOwnershipCheck = 
-            (method.equals("GET") && path.matches(".*/api/pago/ObtenerPago/\\d+.*")) ||
+        // 2. Identificar si es un endpoint protegido que requiere validación de ID
+        boolean isPagoEndpoint = method.equals("GET") && path.matches(".*/api/pago/ObtenerPago/\\d+.*");
+        
+        boolean isOrdenCompraEndpoint = 
             (method.equals("GET") && path.matches(".*/api/pago/ObtenerOrdenCompra/\\d+.*")) ||
             (method.equals("DELETE") && path.matches(".*/api/pago/EliminarOrdenCompra/\\d+.*")) ||
-            (method.equals("GET") && path.matches(".*/api/pago/ObtenerOrdenItem/\\d+.*")) ||
-            (method.equals("DELETE") && path.matches(".*/api/pago/EliminarOrdenItem/\\d+.*")) ||
             (method.equals("GET") && path.matches(".*/api/pago/ObtenerOrdenCompra/\\d+/OrdenesItems.*"));
 
-        if (!requiresOwnershipCheck) {
-            log.info("No requiere verificación de ownership, continuando...");
+        boolean isOrdenItemEndpoint = 
+            (method.equals("GET") && path.matches(".*/api/pago/ObtenerOrdenItem/\\d+.*")) ||
+            (method.equals("DELETE") && path.matches(".*/api/pago/EliminarOrdenItem/\\d+.*"));
+
+        // Si no es ninguno de los endpoints protegidos, continuar (SecurityConfig decide si pasa)
+        if (!isPagoEndpoint && !isOrdenCompraEndpoint && !isOrdenItemEndpoint) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            // Obtener el userId del token
+            // 3. Obtener el userId del token
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             
-            if (authentication == null) {
-                log.error("Authentication es null");
-                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Usuario no autenticado");
-                return;
-            }
-            
-            if (!(authentication.getPrincipal() instanceof UserPrincipal)) {
-                log.error("Principal no es instancia de UserPrincipal");
+            if (authentication == null || !(authentication.getPrincipal() instanceof UserPrincipal)) {
                 sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Usuario no autenticado correctamente");
                 return;
             }
@@ -80,70 +75,41 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             Integer userId = userPrincipal.getUserId();
             
-            log.info("UserId del token: {}", userId);
+            boolean authorized = false;
 
-            // Verificar ownership según el tipo de endpoint
-            if (path.contains("/ObtenerPago/")) {
-                if (!verifyPagoOwnership(path, userId, response)) return;
-                
-            } else if (path.contains("/ObtenerOrdenCompra/") && !path.contains("/OrdenesItems")) {
-                if (!verifyOrdenCompraOwnership(path, userId, response)) return;
-                
-            } else if (path.contains("/EliminarOrdenCompra/")) {
-                if (!verifyOrdenCompraOwnership(path, userId, response)) return;
-                
-            } else if (path.contains("/ObtenerOrdenItem/")) {
-                if (!verifyOrdenItemOwnership(path, userId, response)) return;
-                
-            } else if (path.contains("/EliminarOrdenItem/")) {
-                if (!verifyOrdenItemOwnership(path, userId, response)) return;
-                
-            } else if (path.contains("/OrdenesItems")) {
-                if (!verifyOrdenCompraOwnership(path, userId, response)) return;
+            if (isPagoEndpoint) {
+                authorized = verifyPagoOwnership(path, userId, response);
+            } else if (isOrdenCompraEndpoint) {
+                authorized = verifyOrdenCompraOwnership(path, userId, response);
+            } else if (isOrdenItemEndpoint) {
+                authorized = verifyOrdenItemOwnership(path, userId, response);
             }
             
-            log.info("Verificación de ownership exitosa para userId {}", userId);
+            // Si verify... devuelve false, ya envió la respuesta de error.
+            if (authorized) {
+                filterChain.doFilter(request, response);
+            }
 
         } catch (Exception e) {
             log.error("Error inesperado en la verificación de ownership", e);
             sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                             "Error al verificar permisos: " + e.getMessage());
-            return;
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private boolean verifyPagoOwnership(String path, Integer userId, HttpServletResponse response) 
             throws IOException {
         Integer pagoId = extractIdFromPath(path, "/ObtenerPago/");
+        if (pagoId == null) return sendError(response, HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
         
-        if (pagoId == null) {
-            log.error("No se pudo extraer pagoId de la ruta: {}", path);
-            sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, 
-                            "No se pudo identificar el pago en la URL");
-            return false;
-        }
-        
-        var pagoOpt = pagoRepository.findById(pagoId);
+        Optional<Pago> pagoOpt = pagoRepository.findById(pagoId);
         
         if (pagoOpt.isEmpty()) {
-            log.warn("Pago con id {} no encontrado", pagoId);
-            sendErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, "Pago no encontrado");
-            return false;
+            return sendError(response, HttpServletResponse.SC_NOT_FOUND, "Pago no encontrado");
         }
 
-        var pago = pagoOpt.get();
-        Integer idUsuario = pago.getIdUsuario(); // Asume que Pago tiene un campo idUsuario
-        
-        log.info("IdUsuario del pago: {}", idUsuario);
-
-        if (!idUsuario.equals(userId)) {
-            log.warn("Usuario {} intentó acceder al pago {} que pertenece al usuario {}", 
-                     userId, pagoId, idUsuario);
-            sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, 
-                            "No tienes permiso para acceder a este pago");
-            return false;
+        if (!pagoOpt.get().getIdUsuario().equals(userId)) {
+            return sendError(response, HttpServletResponse.SC_FORBIDDEN, "No tienes permiso para acceder a este pago");
         }
         
         return true;
@@ -151,36 +117,22 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
 
     private boolean verifyOrdenCompraOwnership(String path, Integer userId, HttpServletResponse response) 
             throws IOException {
-        Integer ordenCompraId = extractIdFromPath(path, 
-            path.contains("/EliminarOrdenCompra/") ? "/EliminarOrdenCompra/" : "/ObtenerOrdenCompra/");
+        // Determinar el marcador para extraer ID
+        String marker = path.contains("/EliminarOrdenCompra/") ? "/EliminarOrdenCompra/" : "/ObtenerOrdenCompra/";
+        Integer ordenCompraId = extractIdFromPath(path, marker);
         
-        if (ordenCompraId == null) {
-            log.error("No se pudo extraer ordenCompraId de la ruta: {}", path);
-            sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, 
-                            "No se pudo identificar la orden de compra en la URL");
-            return false;
-        }
+        if (ordenCompraId == null) return sendError(response, HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
         
-        var ordenCompraOpt = ordenCompraRepository.findById(ordenCompraId);
-        
-        if (ordenCompraOpt.isEmpty()) {
-            log.warn("Orden de compra con id {} no encontrada", ordenCompraId);
-            sendErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, 
-                            "Orden de compra no encontrada");
-            return false;
-        }
+        Optional<OrdenCompra> ordenOpt = ordenCompraRepository.findById(ordenCompraId);
+        if (ordenOpt.isEmpty()) return sendError(response, HttpServletResponse.SC_NOT_FOUND, "Orden no encontrada");
 
-        var ordenCompra = ordenCompraOpt.get();
-        Integer idUsuario = ordenCompra.getIdUsuario(); // Asume que OrdenCompra tiene un campo idUsuario
-        
-        log.info("IdUsuario de la orden de compra: {}", idUsuario);
+        // Lógica corregida: Obtener idPago -> Buscar Pago -> Comparar Usuario
+        Integer idPago = ordenOpt.get().getIdPago();
+        if (idPago == null) return sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Orden sin pago asociado");
 
-        if (!idUsuario.equals(userId)) {
-            log.warn("Usuario {} intentó acceder a la orden de compra {} que pertenece al usuario {}", 
-                     userId, ordenCompraId, idUsuario);
-            sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, 
-                            "No tienes permiso para acceder a esta orden de compra");
-            return false;
+        Optional<Pago> pagoOpt = pagoRepository.findById(idPago);
+        if (pagoOpt.isEmpty() || !pagoOpt.get().getIdUsuario().equals(userId)) {
+            return sendError(response, HttpServletResponse.SC_FORBIDDEN, "No tienes permiso para acceder a esta orden");
         }
         
         return true;
@@ -188,45 +140,26 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
 
     private boolean verifyOrdenItemOwnership(String path, Integer userId, HttpServletResponse response) 
             throws IOException {
-        Integer ordenItemId = extractIdFromPath(path, 
-            path.contains("/EliminarOrdenItem/") ? "/EliminarOrdenItem/" : "/ObtenerOrdenItem/");
+        String marker = path.contains("/EliminarOrdenItem/") ? "/EliminarOrdenItem/" : "/ObtenerOrdenItem/";
+        Integer ordenItemId = extractIdFromPath(path, marker);
         
-        if (ordenItemId == null) {
-            log.error("No se pudo extraer ordenItemId de la ruta: {}", path);
-            sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, 
-                            "No se pudo identificar el item en la URL");
-            return false;
-        }
+        if (ordenItemId == null) return sendError(response, HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
         
-        var ordenItemOpt = ordenItemRepository.findById(ordenItemId);
-        
-        if (ordenItemOpt.isEmpty()) {
-            log.warn("Orden item con id {} no encontrado", ordenItemId);
-            sendErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, "Item no encontrado");
-            return false;
-        }
+        Optional<OrdenItem> itemOpt = ordenItemRepository.findById(ordenItemId);
+        if (itemOpt.isEmpty()) return sendError(response, HttpServletResponse.SC_NOT_FOUND, "Item no encontrado");
 
-        var ordenItem = ordenItemOpt.get();
-        // Asume que OrdenItem tiene una relación con OrdenCompra
-        var ordenCompra = ordenItem.getOrdenCompra(); 
-        
-        if (ordenCompra == null) {
-            log.error("OrdenItem {} no tiene una OrdenCompra asociada", ordenItemId);
-            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-                            "Error en la estructura de datos");
-            return false;
-        }
-        
-        Integer idUsuario = ordenCompra.getIdUsuario();
-        
-        log.info("IdUsuario del item (a través de orden de compra): {}", idUsuario);
+        // Lógica corregida: Obtener idOrden -> Buscar Orden -> Obtener idPago -> Buscar Pago -> Comparar Usuario
+        Integer idOrden = itemOpt.get().getIdOrdenCompra();
+        if (idOrden == null) return sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Item sin orden asociada");
 
-        if (!idUsuario.equals(userId)) {
-            log.warn("Usuario {} intentó acceder al item {} que pertenece al usuario {}", 
-                     userId, ordenItemId, idUsuario);
-            sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, 
-                            "No tienes permiso para acceder a este item");
-            return false;
+        Optional<OrdenCompra> ordenOpt = ordenCompraRepository.findById(idOrden);
+        if (ordenOpt.isEmpty()) return sendError(response, HttpServletResponse.SC_NOT_FOUND, "Orden asociada no encontrada");
+
+        Integer idPago = ordenOpt.get().getIdPago();
+        Optional<Pago> pagoOpt = pagoRepository.findById(idPago);
+
+        if (pagoOpt.isEmpty() || !pagoOpt.get().getIdUsuario().equals(userId)) {
+            return sendError(response, HttpServletResponse.SC_FORBIDDEN, "No tienes permiso para acceder a este item");
         }
         
         return true;
@@ -238,22 +171,26 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
             if (startIndex == -1) return null;
             
             String afterMarker = path.substring(startIndex + marker.length());
-            
-            // Extraer solo los dígitos hasta el siguiente '/' o hasta el final
             int endIndex = afterMarker.indexOf('/');
             String idStr = endIndex == -1 ? afterMarker : afterMarker.substring(0, endIndex);
             
             return Integer.parseInt(idStr);
         } catch (Exception e) {
-            log.error("Error al extraer ID de la ruta: {}", path, e);
             return null;
         }
     }
 
+    private boolean sendError(HttpServletResponse response, int status, String message) throws IOException {
+        sendErrorResponse(response, status, message);
+        return false;
+    }
+
     private void sendErrorResponse(HttpServletResponse response, int status, String message) 
             throws IOException {
-        response.setStatus(status);
-        response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"" + message + "\"}");
+        if(!response.isCommitted()) {
+            response.setStatus(status);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"" + message + "\"}");
+        }
     }
 }
