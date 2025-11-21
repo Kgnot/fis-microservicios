@@ -1,10 +1,10 @@
-package uni.fis.multimedia.Controller;
+package uni.fis.multimedia.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uni.fis.multimedia.DTO.CrearMultimediaDTO;
-import uni.fis.multimedia.Entity.Multimedia;
-import uni.fis.multimedia.Service.MultimediaService;
+import uni.fis.multimedia.dto.CrearMultimediaDTO;
+import uni.fis.multimedia.entity.Multimedia;
+import uni.fis.multimedia.service.MultimediaService;
 import java.util.List;
 
 

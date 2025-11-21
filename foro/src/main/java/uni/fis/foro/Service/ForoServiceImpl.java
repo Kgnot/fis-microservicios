@@ -1,20 +1,13 @@
-package uni.fis.foro.Service;
+package uni.fis.foro.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uni.fis.foro.Entity.ForoEntity;
-import uni.fis.foro.Repository.ForoRepository;
+import uni.fis.foro.entity.ForoEntity;
+import uni.fis.foro.repository.ForoRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+import uni.fis.foro.service.ForoService;
 
-public interface ForoService {
-
-    ForoEntity crearForo(String nombre);
-
-    List<ForoEntity> listarForos();
-
-    List<ForoEntity> filtrarForos(String nombre);
-}
 
 @Service
 @Transactional

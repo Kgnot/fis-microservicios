@@ -1,4 +1,4 @@
-package uni.fis.contenido.DTO;
+package uni.fis.contenido.dto;
 
 
 public class ComentarioResponseDTO {

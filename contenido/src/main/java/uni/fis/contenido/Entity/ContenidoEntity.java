@@ -1,4 +1,4 @@
-package uni.fis.contenido.Entity;
+package uni.fis.contenido.entity;
 
 
 import jakarta.persistence.Entity;

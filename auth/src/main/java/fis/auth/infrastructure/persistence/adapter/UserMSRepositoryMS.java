@@ -5,7 +5,7 @@ import fis.auth.domain.model.SignIn;
 import fis.auth.domain.model.TokenRequest;
 import fis.auth.infrastructure.endpoints.UserEndpoint;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.repository;
 import org.springframework.web.client.RestTemplate;
 
 @Repository

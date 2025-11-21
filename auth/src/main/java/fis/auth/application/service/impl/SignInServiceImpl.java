@@ -7,7 +7,7 @@ import fis.auth.domain.model.SignIn;
 import fis.auth.domain.model.Token;
 import fis.auth.domain.model.TokenRequest;
 import fis.auth.domain.service.EncryptStrategy;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.service;
 
 @Service
 public class SignInServiceImpl implements SignInService {

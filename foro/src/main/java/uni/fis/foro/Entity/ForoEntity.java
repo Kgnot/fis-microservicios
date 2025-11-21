@@ -1,4 +1,4 @@
-package uni.fis.foro.Entity;
+package uni.fis.foro.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

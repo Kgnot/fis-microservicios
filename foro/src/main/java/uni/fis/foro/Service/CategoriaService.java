@@ -1,10 +1,10 @@
-package uni.fis.foro.Service;
+package uni.fis.foro.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import uni.fis.foro.Entity.CategoriaEntity;
-import uni.fis.foro.Repository.CategoriaRepository;
+import uni.fis.foro.entity.CategoriaEntity;
+import uni.fis.foro.repository.CategoriaRepository;
 
 
 

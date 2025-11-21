@@ -1,4 +1,4 @@
-package uni.fis.foro.DTO;
+package uni.fis.foro.dto;
 import lombok.Data;
 
 @Data

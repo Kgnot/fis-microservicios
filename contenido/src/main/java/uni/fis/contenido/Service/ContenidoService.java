@@ -1,4 +1,4 @@
-package uni.fis.foro.Service;
+package uni.fis.foro.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import uni.fis.contenido.Entity.ContenidoEntity;
-import uni.fis.contenido.Repository.ContenidoRepository;
+import uni.fis.contenido.entity.ContenidoEntity;
+import uni.fis.contenido.repository.ContenidoRepository;
 
 public interface ContenidoService {
     ContenidoEntity crearContenido(String texto, String usuario);

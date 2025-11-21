@@ -1,14 +1,14 @@
-package uni.fis.foro.Service;
+package uni.fis.foro.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uni.fis.foro.DTO.AsignarCategoriaForoDTO;
-import uni.fis.foro.Entity.ForoCategoriaEntity;
-import uni.fis.foro.Entity.ForoEntity;
-import uni.fis.foro.Entity.CategoriaEntity;
-import uni.fis.foro.Repository.ForoCategoriaRepository;
-import uni.fis.foro.Repository.ForoRepository;
-import uni.fis.foro.Repository.CategoriaRepository;
+import uni.fis.foro.dto.AsignarCategoriaForoDTO;
+import uni.fis.foro.entity.ForoCategoriaEntity;
+import uni.fis.foro.entity.ForoEntity;
+import uni.fis.foro.entity.CategoriaEntity;
+import uni.fis.foro.repository.ForoCategoriaRepository;
+import uni.fis.foro.repository.ForoRepository;
+import uni.fis.foro.repository.CategoriaRepository;
 
 import java.util.List;
 

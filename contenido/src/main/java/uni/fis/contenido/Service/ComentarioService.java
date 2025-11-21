@@ -1,16 +1,16 @@
-package uni.fis.foro.Service;   
+package uni.fis.foro.service;   
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import uni.fis.contenido.DTO.CrearComentarioDTO;
-import uni.fis.contenido.DTO.ComentarioResponseDTO;
-import uni.fis.contenido.Entity.ComentarioEntity;
-import uni.fis.contenido.Entity.ContenidoEntity;
-import uni.fis.contenido.Entity.PublicacionEntity;
-import uni.fis.contenido.Repository.ComentarioRepository;
-import uni.fis.contenido.Repository.PublicacionRepository;
-import uni.fis.contenido.Service.ContenidoService;
+import uni.fis.contenido.dto.CrearComentarioDTO;
+import uni.fis.contenido.dto.ComentarioResponseDTO;
+import uni.fis.contenido.entity.ComentarioEntity;
+import uni.fis.contenido.entity.ContenidoEntity;
+import uni.fis.contenido.entity.PublicacionEntity;
+import uni.fis.contenido.repository.ComentarioRepository;
+import uni.fis.contenido.repository.PublicacionRepository;
+import uni.fis.contenido.service.ContenidoService;
 import java.util.List;
 
 

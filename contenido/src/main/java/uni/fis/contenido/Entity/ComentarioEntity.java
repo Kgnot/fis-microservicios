@@ -1,4 +1,4 @@
-package uni.fis.contenido.Entity;
+package uni.fis.contenido.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,8 +7,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
-import uni.fis.contenido.Entity.PublicacionEntity;
-import uni.fis.contenido.Entity.ContenidoEntity;
+import uni.fis.contenido.entity.PublicacionEntity;
+import uni.fis.contenido.entity.ContenidoEntity;
 import lombok.Data;
 
 

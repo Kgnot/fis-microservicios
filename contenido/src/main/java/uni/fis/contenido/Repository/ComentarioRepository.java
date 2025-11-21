@@ -1,11 +1,11 @@
-package uni.fis.foro.Repository;
+package uni.fis.foro.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
-import uni.fis.contenido.Entity.ComentarioEntity;
-import uni.fis.contenido.Entity.PublicacionEntity;
+import uni.fis.contenido.entity.ComentarioEntity;
+import uni.fis.contenido.entity.PublicacionEntity;
 import java.util.List;
 
 @Repository

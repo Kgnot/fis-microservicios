@@ -1,12 +1,12 @@
-package uni.fis.foro.Controller;
+package uni.fis.foro.controller;
 
-import uni.fis.foro.Entity.ForoEntity;
-import uni.fis.foro.Repository.ForoRepository;
+import uni.fis.foro.entity.ForoEntity;
+import uni.fis.foro.repository.ForoRepository;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uni.fis.foro.Service.ForoService;
-import uni.fis.foro.DTO.CrearForoDTO;
+import uni.fis.foro.service.ForoService;
+import uni.fis.foro.dto.CrearForoDTO;
 
 @RestController
 @RequestMapping("/api/foros")

@@ -1,10 +1,10 @@
-package uni.fis.contenido.Controller;
+package uni.fis.contenido.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uni.fis.contenido.DTO.CrearPublicacionDTO;
-import uni.fis.contenido.DTO.PublicacionResponseDTO;
-import uni.fis.contenido.Entity.Publicacion;
-import uni.fis.contenido.Service.PublicacionService;
+import uni.fis.contenido.dto.CrearPublicacionDTO;
+import uni.fis.contenido.dto.PublicacionResponseDTO;
+import uni.fis.contenido.entity.Publicacion;
+import uni.fis.contenido.service.PublicacionService;
 import java.util.List;
 
 @RestController

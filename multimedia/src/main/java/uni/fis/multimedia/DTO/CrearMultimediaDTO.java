@@ -1,4 +1,4 @@
-package uni.fis.multimedia.DTO;
+package uni.fis.multimedia.dto;
 import lombok.Data;
 
 @Data

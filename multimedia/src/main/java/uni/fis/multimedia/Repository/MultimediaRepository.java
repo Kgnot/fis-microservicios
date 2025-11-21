@@ -1,11 +1,11 @@
-package uni.fis.multimedia.Repository;
+package uni.fis.multimedia.repository;
 
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.Repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
-import uni.fis.multimedia.Entity.MultimediaEntity;
-import uni.fis.contenido.Entity.PublicacionEntity;
+import uni.fis.multimedia.entity.MultimediaEntity;
+import uni.fis.contenido.entity.PublicacionEntity;
 import java.util.List;
 
 @Repository

@@ -1,15 +1,15 @@
-package uni.fis.contenido.Repository;
+package uni.fis.contenido.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
-import uni.fis.contenido.Entity.ComentarioPuntoInteresEntity;
+import uni.fis.contenido.entity.ComentarioPuntoInteresEntity;
 
 
 
 @Repository
-public interface ComentarioPuntoInteres extends JpaRepository<ComentarioPuntoInteresEntity, Long> {
+public interface ComentarioPuntoInteresRepository extends JpaRepository<ComentarioPuntoInteresEntity, Long> {
     List<ComentarioPuntoInteresEntity> findByIdPunto(Long idPunto);
 
 }

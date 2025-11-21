@@ -1,9 +1,9 @@
-package uni.fis.contenido.Controller;
+package uni.fis.contenido.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uni.fis.contenido.DTO.ComentarioResponseDTO;
-import uni.fis.contenido.DTO.CrearComentarioDTO;
-import uni.fis.contenido.Entity.Comentario;
+import uni.fis.contenido.dto.ComentarioResponseDTO;
+import uni.fis.contenido.dto.CrearComentarioDTO;
+import uni.fis.contenido.entity.Comentario;
 import uni.fis.contenido.service.ComentarioService;
 import java.util.List;
 

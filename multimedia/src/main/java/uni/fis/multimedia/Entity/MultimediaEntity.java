@@ -1,4 +1,4 @@
-package uni.fis.multimedia.Entity;
+package uni.fis.multimedia.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

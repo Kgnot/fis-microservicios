@@ -1,10 +1,10 @@
-package uni.fis.foro.Controller;
+package uni.fis.foro.controller;
 
-import uni.fis.foro.Entity.CategoriaEntity;
+import uni.fis.foro.entity.CategoriaEntity;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uni.fis.foro.Service.CategoriaService;
+import uni.fis.foro.service.CategoriaService;
 
 
 

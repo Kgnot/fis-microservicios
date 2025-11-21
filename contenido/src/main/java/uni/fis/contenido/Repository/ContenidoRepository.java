@@ -1,11 +1,11 @@
-package uni.fis.contenido.Repository;
+package uni.fis.contenido.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
-import uni.fis.contenido.Entity.CategoriaEntity;
-import uni.fis.contenido.Entity.ContenidoEntity;
+import uni.fis.contenido.entity.CategoriaEntity;
+import uni.fis.contenido.entity.ContenidoEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 

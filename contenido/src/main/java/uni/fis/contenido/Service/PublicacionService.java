@@ -1,20 +1,20 @@
-package uni.fis.foro.Service;
+package uni.fis.foro.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
-import uni.fis.contenido.DTO.CrearPublicacionDTO;
-import uni.fis.contenido.Repository.PublicacionRepository;
-import uni.fis.foro.Repository.ForoRepository;
-import uni.fis.foro.Repository.MultimediaRepository;
-import uni.fis.contenido.Service.ContenidoService;
-import uni.fis.contenido.DTO.PublicacionResponseDTO;
-import uni.fis.contenido.Entity.PublicacionEntity;
-import uni.fis.contenido.Entity.ContenidoEntity;
-import uni.fis.foro.Entity.ForoEntity;
-import uni.fis.foro.Entity.MultimediaEntity;
+import uni.fis.contenido.dto.CrearPublicacionDTO;
+import uni.fis.contenido.repository.PublicacionRepository;
+import uni.fis.foro.repository.ForoRepository;
+import uni.fis.foro.repository.MultimediaRepository;
+import uni.fis.contenido.service.ContenidoService;
+import uni.fis.contenido.dto.PublicacionResponseDTO;
+import uni.fis.contenido.entity.PublicacionEntity;
+import uni.fis.contenido.entity.ContenidoEntity;
+import uni.fis.foro.entity.ForoEntity;
+import uni.fis.foro.entity.MultimediaEntity;
 
 
 public interface PublicacionService {
