@@ -29,6 +29,6 @@ public class OrdenCompra {
     private Date fecha;
     @Column 
     private BigDecimal total;
-    @Column 
-    private Integer id_pago;
+    @Column(name = "id_pago") 
+    private Integer idPago;
 }

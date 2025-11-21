@@ -31,7 +31,7 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
         OrdenCompra ordenCompra = OrdenCompra.builder()
                                     .fecha(ordenCompraRequest.getFecha())
                                     .total(ordenCompraRequest.getTotal())
-                                    .id_pago(ordenCompraRequest.getId_pago())
+                                    .idPago(ordenCompraRequest.getId_pago())
                                 .build();
         log.info("Procesando la información de la orden de compra");
         ordenCompraRepository.save(ordenCompra);
@@ -56,7 +56,7 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
                                         .id(ordenCompra.getId())
                                         .fecha(ordenCompra.getFecha())
                                         .total(ordenCompra.getTotal())
-                                        .id_pago(ordenCompra.getId_pago())
+                                        .id_pago(ordenCompra.getIdPago())
                                     .build();   
         log.info("Orden de compra encontrada exitosamente!");                 
         return response;
