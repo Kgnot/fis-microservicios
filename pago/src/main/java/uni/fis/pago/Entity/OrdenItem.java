@@ -23,14 +23,14 @@ public class OrdenItem{
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
-    @Column()
-    private Integer id_item;
+    @Column(name = "id_item")
+    private Integer idItem;
     @Column()
     private Integer cantidad;
     @Column()
     private BigDecimal valor_unitario;
     @Column()
     private BigDecimal subtotal;
-    @Column()
-    private Integer id_orden_compra;
+    @Column(name = "id_orden_compra")
+    private Integer idOrdenCompra;
 }

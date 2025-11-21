@@ -72,10 +72,10 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
         for(OrdenItem ordenItem : ordenesItems){
             OrdenItemResponse ordenItemResponse = OrdenItemResponse.builder()
                                             .id(ordenItem.getId())
-                                            .id_item(ordenItem.getId_item())
+                                            .id_item(ordenItem.getIdItem())
                                             .cantidad(ordenItem.getCantidad())
                                             .valor_unitario(ordenItem.getValor_unitario())
-                                            .id_orden_compra(ordenItem.getId_orden_compra())
+                                            .id_orden_compra(ordenItem.getIdOrdenCompra())
                                             .subtotal(ordenItem.getSubtotal())
                                             .build();
             response.add(ordenItemResponse);
