@@ -23,6 +23,7 @@ public class PagoServiceImp implements PagoService{
         log.info("Guardando información del pago: {}" + pagoRequest);
 
         Pago pago = Pago.builder()
+                    .id(pagoRequest.getId())
                     .fecha(pagoRequest.getFecha())
                     .monto_total(pagoRequest.getMonto_total())
                     .idUsuario(pagoRequest.getId_usuario())
