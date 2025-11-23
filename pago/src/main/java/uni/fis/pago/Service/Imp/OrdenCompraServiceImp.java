@@ -1,6 +1,7 @@
 package uni.fis.pago.Service.Imp;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
     @Override
     public Integer crearOrdenCompra(OrdenCompraRequest ordenCompraRequest){
         OrdenCompra ordenCompra = OrdenCompra.builder()
-                                    .fecha(ordenCompraRequest.getFecha())
+                                    .fecha(new Date())
                                     .idPago(ordenCompraRequest.getId_pago())
                                 .build();
         log.info("Procesando la información de la orden de compra");
