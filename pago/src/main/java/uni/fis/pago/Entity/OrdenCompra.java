@@ -1,6 +1,5 @@
 package uni.fis.pago.Entity;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -27,8 +26,6 @@ public class OrdenCompra {
     private Integer id;
     @Column()
     private Date fecha;
-    @Column 
-    private BigDecimal total;
     @Column(name = "id_pago") 
     private Integer idPago;
 }

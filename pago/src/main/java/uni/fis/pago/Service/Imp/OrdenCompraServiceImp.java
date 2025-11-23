@@ -30,7 +30,6 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
     public Integer crearOrdenCompra(OrdenCompraRequest ordenCompraRequest){
         OrdenCompra ordenCompra = OrdenCompra.builder()
                                     .fecha(ordenCompraRequest.getFecha())
-                                    .total(ordenCompraRequest.getTotal())
                                     .idPago(ordenCompraRequest.getId_pago())
                                 .build();
         log.info("Procesando la información de la orden de compra");
@@ -55,7 +54,6 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
         OrdenCompraResponse response = OrdenCompraResponse.builder()
                                         .id(ordenCompra.getId())
                                         .fecha(ordenCompra.getFecha())
-                                        .total(ordenCompra.getTotal())
                                         .id_pago(ordenCompra.getIdPago())
                                     .build();   
         log.info("Orden de compra encontrada exitosamente!");                 
