@@ -39,17 +39,16 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
         
-        // 1. EXCEPCIÓN: crearOrdenCompra es ahora el endpoint libre de validación de ID
-        if (method.equals("POST") && path.endsWith("/api/pago/crearOrdenCompra")) {
+        if (method.equals("POST") && (
+            path.endsWith("/api/pago/crearPago") || 
+            path.endsWith("/api/pago/crearOrdenCompra") ||
+            path.endsWith("/api/pago/crearOrdenItem")
+        )) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Definir endpoints protegidos
-        // Incluimos POST crearPago aquí para que pase por validación
-        boolean isPagoEndpoint = 
-            (method.equals("GET") && path.matches(".*/api/pago/ObtenerPago/\\d+.*")) ||
-            (method.equals("POST") && path.contains("/api/pago/crearPago")); // Asume ruta tipo /crearPago/{id}
+        boolean isPagoEndpoint = method.equals("GET") && path.matches(".*/api/pago/ObtenerPago/\\d+.*");
         
         boolean isOrdenCompraEndpoint = 
             (method.equals("GET") && path.matches(".*/api/pago/ObtenerOrdenCompra/\\d+.*")) ||
@@ -92,17 +91,14 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             log.error("Error en filtro ownership", e);
-            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno");
+            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno de seguridad");
         }
     }
 
     private boolean verifyPagoOwnership(String path, Integer userId, HttpServletResponse response) 
             throws IOException {
-        // Detectar marcador: puede ser obtener o crear
-        String marker = path.contains("/ObtenerPago/") ? "/ObtenerPago/" : "/crearPago/";
-        
-        Integer pagoId = extractIdFromPath(path, marker);
-        if (pagoId == null) return sendError(response, HttpServletResponse.SC_BAD_REQUEST, "ID de pago no encontrado en la URL");
+        Integer pagoId = extractIdFromPath(path, "/ObtenerPago/");
+        if (pagoId == null) return sendError(response, HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
         
         Optional<Pago> pagoOpt = pagoRepository.findById(pagoId);
         
@@ -111,9 +107,8 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
         }
 
         if (!pagoOpt.get().getIdUsuario().equals(userId)) {
-            return sendError(response, HttpServletResponse.SC_FORBIDDEN, "No tienes permiso sobre este pago");
+            return sendError(response, HttpServletResponse.SC_FORBIDDEN, "No autorizado");
         }
-        
         return true;
     }
 
@@ -134,22 +129,21 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
         if (pagoOpt.isEmpty() || !pagoOpt.get().getIdUsuario().equals(userId)) {
             return sendError(response, HttpServletResponse.SC_FORBIDDEN, "No autorizado");
         }
-        
         return true;
     }
 
     private boolean verifyOrdenItemOwnership(String path, Integer userId, HttpServletResponse response) 
             throws IOException {
         String marker = path.contains("/EliminarOrdenItem/") ? "/EliminarOrdenItem/" : "/ObtenerOrdenItem/";
-        Integer ordenItemId = extractIdFromPath(path, marker);
+        Integer itemId = extractIdFromPath(path, marker);
         
-        if (ordenItemId == null) return sendError(response, HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
+        if (itemId == null) return sendError(response, HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
         
-        Optional<OrdenItem> itemOpt = ordenItemRepository.findById(ordenItemId);
+        Optional<OrdenItem> itemOpt = ordenItemRepository.findById(itemId);
         if (itemOpt.isEmpty()) return sendError(response, HttpServletResponse.SC_NOT_FOUND, "Item no encontrado");
 
         Integer idOrden = itemOpt.get().getIdOrdenCompra();
-        if (idOrden == null) return sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Item huérfano");
+        if (idOrden == null) return sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Item sin orden asociada");
 
         Optional<OrdenCompra> ordenOpt = ordenCompraRepository.findById(idOrden);
         if (ordenOpt.isEmpty()) return sendError(response, HttpServletResponse.SC_NOT_FOUND, "Orden asociada no encontrada");
@@ -160,7 +154,6 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
         if (pagoOpt.isEmpty() || !pagoOpt.get().getIdUsuario().equals(userId)) {
             return sendError(response, HttpServletResponse.SC_FORBIDDEN, "No autorizado");
         }
-        
         return true;
     }
 
@@ -172,7 +165,6 @@ public class PagoOwnershipFilter extends OncePerRequestFilter {
             String afterMarker = path.substring(startIndex + marker.length());
             int endIndex = afterMarker.indexOf('/');
             String idStr = endIndex == -1 ? afterMarker : afterMarker.substring(0, endIndex);
-            
             return Integer.parseInt(idStr);
         } catch (Exception e) {
             return null;
