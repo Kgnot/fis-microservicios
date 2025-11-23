@@ -26,19 +26,17 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-           
+                .requestMatchers("POST", "/api/pago/crearPago").authenticated()
                 .requestMatchers("POST", "/api/pago/crearOrdenCompra").authenticated()
-                
-                .requestMatchers("POST", "/api/pago/crearPago/**").authenticated()
+                .requestMatchers("POST", "/api/pago/crearOrdenItem").authenticated()
                 
                 .requestMatchers("GET", "/api/pago/ObtenerPago/{id}").authenticated()
                 
                 .requestMatchers("GET", "/api/pago/ObtenerOrdenCompra/{id}").authenticated()
                 .requestMatchers("DELETE", "/api/pago/EliminarOrdenCompra/{idOrdenCompra}").authenticated()
-                
-                .requestMatchers("POST", "/api/pago/crearOrdenItem").authenticated()
-                .requestMatchers("GET", "/api/pago/ObtenerOrdenItem/{idOrdenItem}").authenticated()
                 .requestMatchers("GET", "/api/pago/ObtenerOrdenCompra/{idOrdenCompra}/OrdenesItems").authenticated()
+                
+                .requestMatchers("GET", "/api/pago/ObtenerOrdenItem/{idOrdenItem}").authenticated()
                 .requestMatchers("DELETE", "/api/pago/EliminarOrdenItem/{idOrdenItem}").authenticated()
                 
                 .anyRequest().authenticated()
