@@ -26,7 +26,10 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("POST", "/api/pago/crearPago").authenticated()
+           
+                .requestMatchers("POST", "/api/pago/crearOrdenCompra").authenticated()
+                
+                .requestMatchers("POST", "/api/pago/crearPago/**").authenticated()
                 
                 .requestMatchers("GET", "/api/pago/ObtenerPago/{id}").authenticated()
                 
@@ -40,9 +43,7 @@ public class SecurityConfig {
                 
                 .anyRequest().authenticated()
             )
-            // Primero valida el JWT
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            // Luego verifica ownership
             .addFilterAfter(pagoOwnershipFilter, JwtAuthenticationFilter.class);
 
         return http.build();
