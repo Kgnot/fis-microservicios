@@ -9,6 +9,7 @@ import fis.auth.application.service.TokenService;
 import fis.auth.domain.model.Login;
 import fis.auth.domain.model.Token;
 import fis.auth.domain.model.TokenRequest;
+import fis.auth.infrastructure.error.NoUserFoundError;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,14 +25,18 @@ public class LoginServiceImpl implements LoginService {
         this.tokenService = tokenService;
         this.repository = repository;
     }
-    // cambio para subir la rama
-    @Override
-    public Token execute(Login login) {
-        //Obtenemos el TokenRequest, es decir, el nombre y rol desde el microservicio de usuario
-        TokenRequest req = repository.findNameAndRolUser(login.email(), login.password());
-        // Luego generamos el token.
-        TokenCommand tokenCommand = new GenerateTokenCommand(this.tokenService, req);
 
-        return tokenCommand.execute();
+    // cambio para subir la rama
+        @Override
+        public Token execute(Login login) throws NoUserFoundError {
+            //Obtenemos el TokenRequest, es decir, el nombre y rol desde el microservicio de usuario
+            TokenRequest req = repository.findNameAndRolUser(login.email(), login.password());
+            if (req == null) {
+                throw NoUserFoundError.of("Usuario no encontrado con las credenciales proporcionadas");
+            }
+            // Luego generamos el token.
+            TokenCommand tokenCommand = new GenerateTokenCommand(this.tokenService, req);
+
+            return tokenCommand.execute();
+        }
     }
-}
