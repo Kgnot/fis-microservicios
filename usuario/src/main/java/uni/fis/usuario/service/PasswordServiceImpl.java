@@ -3,6 +3,8 @@ package uni.fis.usuario.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import uni.fis.usuario.entity.PasswordEntity;
+import uni.fis.usuario.error.InvalidCredentialsException;
+import uni.fis.usuario.error.UserNotFoundException;
 import uni.fis.usuario.repository.PasswordRepository;
 import uni.fis.usuario.repository.UserRepository;
 
@@ -27,14 +29,27 @@ public class PasswordServiceImpl implements PasswordService {
         // Buscamos el usuario
         var usuario = userRepository.findByEmail(email);
         if (usuario.isEmpty()) {
-            return false;
+            throw UserNotFoundException.byEmail(email);
         }
 
         // Buscamos la última contraseña
         Optional<PasswordEntity> ultima = repository.findMasRecienteById(usuario.get().getId());
 
-        return ultima
-                .map(passwordEntity -> passwordEncoder.matches(password, passwordEntity.getChars()))
-                .orElse(false);
+        if (ultima.isEmpty()) {
+            throw new InvalidCredentialsException("No se encontró contraseña para el usuario");
+        }
+
+        boolean isValid = passwordEncoder.matches(password, ultima.get().getChars());
+
+        if (!isValid) {
+            throw InvalidCredentialsException.invalid();
+        }
+
+        return true;
+    }
+
+    // Método adicional para encriptar contraseñas (útil para el UserService)
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 }
