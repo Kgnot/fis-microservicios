@@ -1,6 +1,7 @@
 package fis.auth.infrastructure.error;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fis.auth.domain.error.InvalidCredentialsException;
 import fis.auth.domain.error.InvalidIdentificationException;
 import fis.auth.domain.error.MissingRequiredFieldException;
 import fis.auth.domain.error.TutorApprovalPendingException;
@@ -18,12 +19,15 @@ public class UserMSErrorHandler {
         int errorCode = e.getStatusCode().value();
 
         switch (errorCode) {
-            case 404: // NOT FOUND - USUARIO NO EXISTE
+            case 401: // UNAUTHORIZED - Credenciales inválidas
+                throw new InvalidCredentialsException(errorMessage);
+
+            case 404: // NOT FOUND - Usuario no existe
                 throw NoUserFoundError.of(errorMessage);
 
-            case 409: // CONFLICT
+            case 409: // CONFLICT - Recurso ya existe
                 if (requestData instanceof SignIn signIn) {
-                    if (errorMessage.contains("email")) {
+                    if (errorMessage.contains("email") || errorMessage.contains("correo")) {
                         throw UserAlreadyExistsException.byEmail(signIn.email());
                     } else if (errorMessage.contains("identificación")) {
                         throw UserAlreadyExistsException.byIdentification(signIn.documento());
@@ -31,13 +35,13 @@ public class UserMSErrorHandler {
                 }
                 throw UserAlreadyExistsException.byEmail("unknown");
 
-            case 400:
+            case 400: // BAD_REQUEST - Datos inválidos
                 throw new MissingRequiredFieldException(errorMessage);
 
-            case 403:
+            case 403: // FORBIDDEN - Aprobación pendiente
                 throw new TutorApprovalPendingException(errorMessage);
 
-            case 422:
+            case 422: // UNPROCESSABLE_ENTITY - Identificación inválida
                 throw new InvalidIdentificationException(errorMessage);
 
             default:
