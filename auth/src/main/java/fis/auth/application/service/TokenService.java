@@ -3,7 +3,7 @@ package fis.auth.application.service;
 import fis.auth.domain.service.TokenStrategy;
 import fis.auth.domain.model.Token;
 import fis.auth.domain.model.TokenRequest;
-import org.springframework.stereotype.service;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TokenService {
