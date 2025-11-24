@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @Builder
 
 public class PagoRequest {
-    private Integer id;
     private Date fecha;
     private BigDecimal monto_total;
     private Integer id_usuario;
