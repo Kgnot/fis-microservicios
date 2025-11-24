@@ -1,16 +1,16 @@
 package uni.fis.usuario.dto.request;
 
 public record UserRequest (
-        String name,
-        String apellido1,
-        String apellido2,
-        String fechaNacimiento, // esta debe ser año-mes-dia | debe ser enviado como LocalDate
-        String documento,
-        Integer imgPerfil, // porque numero?
-        String email,
+        String name, // necesario
+        String apellido1, // necesario
+        String apellido2, // no necesario
+        String fechaNacimiento, // necesario
+        String documento, // necesario y unico
+        Integer imgPerfil, // no necesario
+        String email, // necesario y unico
         Integer strikes, // por defecto 0 al crear
-        Integer idRol,
-        Integer idMultimedia,// que diferencia hay con el img
-        String password // Aqui la contraseña ya viene codificada jeje [no se que tan seguro es eso]
+        Integer idRol, // no necesario
+        Integer idMultimedia,// no necesario
+        String password // necesario
 ){
 }
