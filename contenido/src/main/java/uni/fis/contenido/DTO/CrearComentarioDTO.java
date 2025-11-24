@@ -4,7 +4,7 @@ import lombok.Data;
 @Data
 public class CrearComentarioDTO {
     private String textoContenido;
-    private String usuario;
+    private Long usuario;
     private Long idPublicacion;
     private Long idComentarioPadre;
 }

@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface ContenidoRepository extends JpaRepository<ContenidoEntity, Long> {
     List<ContenidoEntity> findByFecha(LocalDateTime fecha);
-    List<ContenidoEntity> findByUsuario(String usuario);
+    List<ContenidoEntity> findByUsuario(Long usuario);
 }

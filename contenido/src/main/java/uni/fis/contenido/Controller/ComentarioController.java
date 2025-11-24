@@ -28,7 +28,8 @@ public class ComentarioController {
 
     @GetMapping("/usuario/{usuario}")
     public ResponseEntity<List<ComentarioResponseDTO>> listarPorUsuario(@PathVariable String usuario) {
-        return ResponseEntity.ok(comentarioService.listarPorUsuario(usuario));
+        Long usuarioLong = Long.parseLong(usuario);
+        return ResponseEntity.ok(comentarioService.listarPorUsuario(usuarioLong));
     }
 
     @GetMapping("/publicacion/{idPublicacion}")

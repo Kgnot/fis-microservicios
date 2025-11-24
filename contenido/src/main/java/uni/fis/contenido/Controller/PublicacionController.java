@@ -29,6 +29,7 @@ public class PublicacionController {
 
     @GetMapping("/usuario/{usuario}")
     public ResponseEntity<List<PublicacionResponseDTO>> listarPorUsuario(@PathVariable String usuario) {
-        return ResponseEntity.ok(publicacionService.listarPorUsuario(usuario));
+        Long usuarioLong = Long.parseLong(usuario);
+        return ResponseEntity.ok(publicacionService.listarPorUsuario(usuarioLong));
     }
 }

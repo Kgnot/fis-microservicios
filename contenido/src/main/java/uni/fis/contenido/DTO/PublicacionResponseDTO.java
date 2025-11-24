@@ -6,11 +6,10 @@ import lombok.Data;
 public class PublicacionResponseDTO {
     private Long id;
     private String titulo;
-    private String usuario;
+    private Long usuario;
     private Integer likes;
     private String textoContenido;
     private LocalDateTime fechaContenido;
     private Long idForo;
-    private String nombreForo;
-    private String urlMultimedia;
+    private Long idMultimedia;
 }

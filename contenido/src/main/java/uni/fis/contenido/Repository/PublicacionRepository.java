@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface PublicacionRepository extends JpaRepository<PublicacionEntity, Long> {
     List<PublicacionEntity> findByForo(Long foro);
+    List<PublicacionEntity> findByUsuario(Long usuario);
 }

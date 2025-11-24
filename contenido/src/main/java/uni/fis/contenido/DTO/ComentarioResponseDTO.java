@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 @Data
 public class ComentarioResponseDTO {
     private Long id;
-    private String usuario;
+    private Long usuario;
     private String textoContenido;
     private LocalDateTime fechaContenido;
     private Long idPublicacion;

@@ -1,26 +1,18 @@
 package uni.fis.contenido.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Optional;
 import uni.fis.contenido.dto.CrearPublicacionDTO;
 import uni.fis.contenido.repository.PublicacionRepository;
-import uni.fis.foro.repository.ForoRepository;
-import uni.fis.foro.repository.MultimediaRepository;
-import uni.fis.contenido.service.ContenidoService;
 import uni.fis.contenido.dto.PublicacionResponseDTO;
 import uni.fis.contenido.entity.PublicacionEntity;
 import uni.fis.contenido.entity.ContenidoEntity;
-import uni.fis.foro.entity.ForoEntity;
-import uni.fis.foro.entity.MultimediaEntity;
 
 
 public interface PublicacionService {
     PublicacionEntity crearPublicacion(CrearPublicacionDTO dto);
     List<PublicacionResponseDTO> listarPorForo(Long idForo);
-    List<PublicacionResponseDTO> listarPorUsuario(String usuario);
+    List<PublicacionResponseDTO> listarPorUsuario(Long usuario);
 }
 
 @Service
@@ -28,36 +20,26 @@ class PublicacionServiceImpl implements PublicacionService {
 
     private final PublicacionRepository publicacionRepository;
     private final ContenidoService contenidoService;
-    private final ForoRepository foroRepository;
-    private final MultimediaRepository multimediaRepository;
 
     public PublicacionServiceImpl(
             PublicacionRepository publicacionRepository,
             ContenidoService contenidoService,
-            ForoRepository foroRepository,
-            MultimediaRepository multimediaRepository) {
+            Long foroRepository,
+            Long multimediaRepository) {
         this.publicacionRepository = publicacionRepository;
         this.contenidoService = contenidoService;
-        this.foroRepository = foroRepository;
-        this.multimediaRepository = multimediaRepository;
     }
 
     @Override
     public PublicacionEntity crearPublicacion(CrearPublicacionDTO dto) {
 
         ContenidoEntity contenido = contenidoService.crearContenido(dto.getTextoContenido(), dto.getUsuario());
-        ForoEntity foro = foroRepository.findById(dto.getIdForo()).orElseThrow();
-
-        MultimediaEntity multimedia = null;
-        if (dto.getIdMultimedia() != null) {
-            multimedia = multimediaRepository.findById(dto.getIdMultimedia()).orElse(null);
-        }
 
         PublicacionEntity pub = new PublicacionEntity();
         pub.setTitulo(dto.getTitulo());
         pub.setContenido(contenido);
-        pub.setMultimedia(multimedia);
-        pub.setForo(foro);
+        pub.setMultimedia(dto.getIdMultimedia());
+        pub.setForo(dto.getIdForo());
         pub.setLikes(0);
 
         return publicacionRepository.save(pub);
@@ -65,16 +47,15 @@ class PublicacionServiceImpl implements PublicacionService {
 
     @Override
     public List<PublicacionResponseDTO> listarPorForo(Long idForo) {
-        ForoEntity foro = foroRepository.findById(idForo).orElseThrow();
-        return publicacionRepository.findByForo(foro).stream()
+        return publicacionRepository.findByForo(idForo).stream()
                 .map(this::mapToDTO)
                 .toList();
     }
 
     @Override
-    public List<PublicacionResponseDTO> listarPorUsuario(String usuario) {
+    public List<PublicacionResponseDTO> listarPorUsuario(Long usuario) {
         return publicacionRepository.findAll().stream()
-                .filter(p -> p.getContenido().getUsuario().equals(usuario))
+                .filter(p -> p.getContenido().getIdAutor().equals(usuario))
                 .map(this::mapToDTO)
                 .toList();
     }
@@ -84,14 +65,12 @@ class PublicacionServiceImpl implements PublicacionService {
 
         dto.setId(pub.getId());
         dto.setTitulo(pub.getTitulo());
-        dto.setUsuario(pub.getContenido().getUsuario());
+        dto.setUsuario(pub.getContenido().getIdAutor());
         dto.setLikes(pub.getLikes());
         dto.setTextoContenido(pub.getContenido().getTexto());
-        dto.setFechaContenido(pub.getContenido().getFecha());
-        dto.setIdForo(pub.getForo().getId());
-        dto.setNombreForo(pub.getForo().getNombre());
-
-        dto.setUrlMultimedia(pub.getMultimedia() != null ? pub.getMultimedia().getUrl() : null);
+        dto.setFechaContenido(pub.getContenido().getFechaCreacion());
+        dto.setIdForo(pub.getForo());
+        dto.setIdMultimedia(pub.getMultimedia());
 
         return dto;
     }

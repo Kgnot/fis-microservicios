@@ -6,7 +6,7 @@ import lombok.Data;
 public class CrearPublicacionDTO {
     private String titulo;
     private String textoContenido;
-    private String usuario;
+    private Long usuario;
     private Long idForo;
     private Long idMultimedia; // opcional
 }
