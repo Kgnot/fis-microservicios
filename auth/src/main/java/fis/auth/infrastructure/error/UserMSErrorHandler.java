@@ -6,7 +6,6 @@ import fis.auth.domain.error.MissingRequiredFieldException;
 import fis.auth.domain.error.TutorApprovalPendingException;
 import fis.auth.domain.model.SignIn;
 import fis.auth.infrastructure.dto.response.api.ApiResponse;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -19,9 +18,12 @@ public class UserMSErrorHandler {
         int errorCode = e.getStatusCode().value();
 
         switch (errorCode) {
+            case 404: // NOT FOUND - USUARIO NO EXISTE
+                throw NoUserFoundError.of(errorMessage);
+
             case 409: // CONFLICT
                 if (requestData instanceof SignIn signIn) {
-                    if (errorMessage.contains("email") || errorMessage.contains("correo")) {
+                    if (errorMessage.contains("email")) {
                         throw UserAlreadyExistsException.byEmail(signIn.email());
                     } else if (errorMessage.contains("identificación")) {
                         throw UserAlreadyExistsException.byIdentification(signIn.documento());
