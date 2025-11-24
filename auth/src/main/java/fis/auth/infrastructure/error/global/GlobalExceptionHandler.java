@@ -1,5 +1,6 @@
 package fis.auth.infrastructure.error.global;
 
+import fis.auth.domain.error.InvalidCredentialsException;
 import fis.auth.domain.error.InvalidIdentificationException;
 import fis.auth.domain.error.MissingRequiredFieldException;
 import fis.auth.domain.error.TutorApprovalPendingException;
@@ -39,6 +40,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error(ex.getMessage(), 409));
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiResponse<?>> handleInvalidCredentials(InvalidCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(ex.getMessage(), 401));
     }
 
     // ========== EXCEPCIONES DE DOMINIO ==========
