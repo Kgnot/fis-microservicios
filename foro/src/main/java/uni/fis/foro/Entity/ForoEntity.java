@@ -12,7 +12,8 @@ import lombok.Data;
 @Data
 @Table(name = "foro")
 public class ForoEntity {
-    @Id @GeneratedValue
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
 

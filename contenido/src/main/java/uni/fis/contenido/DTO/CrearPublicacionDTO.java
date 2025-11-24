@@ -1,8 +1,8 @@
 package uni.fis.contenido.dto;
 
-import java.time.LocalDateTime;
+import lombok.Data;
 
-
+@Data
 public class CrearPublicacionDTO {
     private String titulo;
     private String textoContenido;

@@ -1,4 +1,4 @@
-package uni.fis.foro.service;   
+package uni.fis.contenido.service;   
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,8 @@ public interface ComentarioService {
     List<ComentarioResponseDTO> listarPorUsuario(String usuario);
     List<ComentarioResponseDTO> listarPorPublicacion(Long idPublicacion);
 }
+
+
 
 @Service
 @Transactional
@@ -87,5 +89,25 @@ public class ComentarioServiceImpl implements ComentarioService {
         dto.setIdPublicacion(c.getPublicacion() != null ? c.getPublicacion().getId() : null);
         dto.setIdComentarioPadre(c.getComentarioPadre() != null ? c.getComentarioPadre().getId() : null);
         return dto;
+    }
+
+    public ComentarioEntity crearComentario(CrearComentarioDTO dto) {
+        ContenidoEntity contenido = contenidoService.crearContenido(dto.getTextoContenido(), dto.getUsuario());
+        ComentarioEntity comentario = new ComentarioEntity();
+        comentario.setContenido(contenido);
+
+        if (dto.getIdComentarioPadre() != null) {
+            comentario.setComentarioPadre(
+                    comentarioRepository.findById(dto.getIdComentarioPadre()).orElseThrow()
+            );
+        }
+
+        if (dto.getIdPublicacion() != null) {
+            comentario.setPublicacion(
+                    publicacionRepository.findById(dto.getIdPublicacion()).orElseThrow()
+            );
+        }
+
+        return comentarioRepository.save(comentario);
     }
 }

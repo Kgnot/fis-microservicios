@@ -3,7 +3,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uni.fis.contenido.dto.CrearPublicacionDTO;
 import uni.fis.contenido.dto.PublicacionResponseDTO;
-import uni.fis.contenido.entity.Publicacion;
+import uni.fis.contenido.entity.PublicacionEntity;
 import uni.fis.contenido.service.PublicacionService;
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class PublicacionController {
     }
 
     @PostMapping
-    public ResponseEntity<Publicacion> crear(@RequestBody CrearPublicacionDTO dto) {
+    public ResponseEntity<PublicacionEntity> crear(@RequestBody CrearPublicacionDTO dto) {
         return ResponseEntity.ok(publicacionService.crearPublicacion(dto));
     }
 

@@ -3,7 +3,7 @@ package uni.fis.multimedia.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uni.fis.multimedia.dto.CrearMultimediaDTO;
-import uni.fis.multimedia.entity.Multimedia;
+import uni.fis.multimedia.entity.MultimediaEntity;
 import uni.fis.multimedia.service.MultimediaService;
 import java.util.List;
 
@@ -20,17 +20,17 @@ public class MultimediaController {
     }
 
     @PostMapping
-    public ResponseEntity<Multimedia> crear(@RequestBody CrearMultimediaDTO dto) {
+    public ResponseEntity<MultimediaEntity> crear(@RequestBody CrearMultimediaDTO dto) {
         return ResponseEntity.ok(multimediaService.guardar(dto));
     }
 
     @GetMapping
-    public ResponseEntity<List<Multimedia>> listar() {
+    public ResponseEntity<List<MultimediaEntity>> listar() {
         return ResponseEntity.ok(multimediaService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Multimedia> obtener(@PathVariable Long id) {
+    public ResponseEntity<MultimediaEntity> obtener(@PathVariable Long id) {
         return ResponseEntity.ok(multimediaService.obtenerImagen(id));
     }
 }

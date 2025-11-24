@@ -7,9 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import uni.fis.contenido.entity.ContenidoEntity;
-import uni.fis.foro.entity.MultimediaEntity;
-import uni.fis.foro.entity.ForoEntity;
+
 
 import lombok.Data;
 
@@ -30,11 +28,11 @@ public class PublicacionEntity {
 
     @ManyToOne
     @JoinColumn(name = "multimedia_id")
-    private MultimediaEntity multimedia;
+    private Long multimedia;
 
     @ManyToOne
     @JoinColumn(name = "foro_id")
-    private ForoEntity foro;
+    private Long foro;
 
     private int likes;
 }

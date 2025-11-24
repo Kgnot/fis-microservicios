@@ -3,7 +3,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uni.fis.contenido.dto.ComentarioResponseDTO;
 import uni.fis.contenido.dto.CrearComentarioDTO;
-import uni.fis.contenido.entity.Comentario;
+import uni.fis.contenido.entity.ComentarioEntity;
 import uni.fis.contenido.service.ComentarioService;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class ComentarioController {
     }
 
     @PostMapping
-    public ResponseEntity<Comentario> crear(@RequestBody CrearComentarioDTO dto) {
+    public ResponseEntity<ComentarioEntity> crear(@RequestBody CrearComentarioDTO dto) {
         return ResponseEntity.ok(comentarioService.crearComentario(dto));
     }
 

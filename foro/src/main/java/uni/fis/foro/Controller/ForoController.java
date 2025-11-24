@@ -1,7 +1,6 @@
 package uni.fis.foro.controller;
 
 import uni.fis.foro.entity.ForoEntity;
-import uni.fis.foro.repository.ForoRepository;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,6 @@
 package uni.fis.multimedia.service;
 
-import org.springframework.stereotype.service;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uni.fis.multimedia.dto.CrearMultimediaDTO;
 import uni.fis.multimedia.entity.MultimediaEntity;

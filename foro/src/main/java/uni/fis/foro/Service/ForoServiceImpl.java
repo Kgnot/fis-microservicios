@@ -5,8 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uni.fis.foro.entity.ForoEntity;
 import uni.fis.foro.repository.ForoRepository;
 import java.util.List;
-import java.util.stream.Collectors;
-import uni.fis.foro.service.ForoService;
 
 
 @Service

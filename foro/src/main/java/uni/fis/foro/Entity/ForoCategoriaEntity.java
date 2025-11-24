@@ -7,8 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
-import uni.fis.foro.entity.CategoriaEntity;
-import uni.fis.foro.entity.ForoEntity;
 import lombok.Data;
 
 
@@ -16,7 +14,8 @@ import lombok.Data;
 @Data
 @Table(name = "foroCategoria")
 public class ForoCategoriaEntity {
-    @Id @GeneratedValue
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

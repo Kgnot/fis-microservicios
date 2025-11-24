@@ -13,7 +13,8 @@ import lombok.Data;
 @Data
 @Table(name = "multimedia")
 public class MultimediaEntity {
-    @Id @GeneratedValue
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String url;

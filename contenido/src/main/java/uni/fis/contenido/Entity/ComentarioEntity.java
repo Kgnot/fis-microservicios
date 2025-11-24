@@ -7,8 +7,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
-import uni.fis.contenido.entity.PublicacionEntity;
-import uni.fis.contenido.entity.ContenidoEntity;
 import lombok.Data;
 
 
@@ -16,11 +14,12 @@ import lombok.Data;
 @Data
 @Table(name = "comentario")
 public class ComentarioEntity {
-    @Id @GeneratedValue
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    private Comentario comentarioPadre;
+    private ComentarioEntity comentarioPadre;
 
     @ManyToOne
     @JoinColumn(name = "publicacion_id")

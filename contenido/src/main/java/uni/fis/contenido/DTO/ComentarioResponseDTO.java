@@ -1,6 +1,8 @@
 package uni.fis.contenido.dto;
+import lombok.Data;
+import java.time.LocalDateTime;
 
-
+@Data
 public class ComentarioResponseDTO {
     private Long id;
     private String usuario;

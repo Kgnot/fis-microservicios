@@ -1,4 +1,4 @@
-package uni.fis.foro.service;
+package uni.fis.contenido.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;

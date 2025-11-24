@@ -11,7 +11,8 @@ import lombok.Data;
 @Data
 @Table(name = "categoria")
 public class CategoriaEntity {
-    @Id @GeneratedValue
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
 
