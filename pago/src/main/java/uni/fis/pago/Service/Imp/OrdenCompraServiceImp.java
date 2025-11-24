@@ -1,5 +1,6 @@
 package uni.fis.pago.Service.Imp;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -81,5 +82,14 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
         }
         log.info("Items encontrados exitosamente!");
         return response;
+    }
+    @Override
+    public BigDecimal calcularMontoTotal(Integer idOrdenCompra){
+        List<OrdenItemResponse> items = consultarOrdenesItems(idOrdenCompra);
+        BigDecimal montoTotal = new BigDecimal(0);
+        for (OrdenItemResponse item : items){
+            montoTotal = montoTotal.add(item.getSubtotal());
+        }
+        return montoTotal;
     }
 }
