@@ -32,7 +32,8 @@ public class SignInServiceImpl implements SignInService {
         // segundo, encriptamos
         String passwordEncrypted = encrypt.encrypt(signIn.password());
         // tercero agregamos a la base de datos:
-        TokenRequest tokenRequest = repository.registerUser(signIn);
+        TokenRequest tokenRequest = repository
+                .registerUser(signIn.withPassword(passwordEncrypted));
         if (tokenRequest != null) {
             return tokenService.generateToken(tokenRequest);
         }

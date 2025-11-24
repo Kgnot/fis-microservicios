@@ -1,9 +1,32 @@
 package fis.auth.domain.model;
 
 public record SignIn(
-        //no se que cosas se requieren en el sign in xd
         String name,
+        String apellido1,
+        String apellido2,
+        String fechaNacimiento,
+        String documento,
+        Integer imgPerfil,
         String email,
+        Integer strikes,
+        Integer idRol,
+        Integer idMultimedia,
         String password
 ) {
+
+    public SignIn withPassword(String newPassword) {
+        return new SignIn(
+                this.name,
+                this.apellido1,
+                this.apellido2,
+                this.fechaNacimiento,
+                this.documento,
+                this.imgPerfil,
+                this.email,
+                this.strikes,
+                this.idRol,
+                this.idMultimedia,
+                newPassword
+        );
+    }
 }

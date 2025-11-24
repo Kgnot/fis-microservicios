@@ -1,6 +1,6 @@
 package fis.auth.infrastructure.dto.request;
 
-public record LoginRequest(
+public record UserValidateRequest(
         String email,
         String password
 ) {
