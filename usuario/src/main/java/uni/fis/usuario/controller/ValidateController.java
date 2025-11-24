@@ -1,13 +1,13 @@
 package uni.fis.usuario.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uni.fis.usuario.dto.request.UserValidateRequest;
 import uni.fis.usuario.dto.response.ApiResponse;
 import uni.fis.usuario.dto.response.TokenResponse;
+import uni.fis.usuario.error.InvalidCredentialsException;
+import uni.fis.usuario.error.UserNotFoundException;
 import uni.fis.usuario.service.PasswordService;
 import uni.fis.usuario.service.UserService;
 
@@ -21,21 +21,26 @@ public class ValidateController {
 
     @PostMapping("/auth/verify")
     public ResponseEntity<ApiResponse<TokenResponse>> validateUser(@RequestBody UserValidateRequest userValidateRequest) {
-        var validate = passwordService.validate(userValidateRequest.email(), userValidateRequest.password());
-        if (validate) {
-            var user = userService.findByEmail(userValidateRequest.email());
+        try {
+            passwordService.validate(userValidateRequest.email(), userValidateRequest.password());
 
-            return user.map(userDto -> ResponseEntity.ok(
-                    ApiResponse.success("Usuario verificado",
-                            new TokenResponse(
-                                    userDto.id(),
-                                    userDto.idRol()
-                            )
+            var user = userService.findByEmail(userValidateRequest.email())
+                    .orElseThrow(() -> UserNotFoundException.byEmail(userValidateRequest.email()));
+
+            return ResponseEntity.ok(
+                    ApiResponse.success(
+                            "Usuario verificado",
+                            new TokenResponse(user.id(), user.idRol())
                     )
-            )).orElseGet(() -> ResponseEntity
-                    .of(ProblemDetail.forStatus(403))
-                    .build());
+            );
+
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.error(e.getMessage(), 404));
+
+        } catch (InvalidCredentialsException e) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.error(e.getMessage(), 401));
         }
-        return new ResponseEntity<>(ApiResponse.error("No se encontró el usuario", 403), HttpStatusCode.valueOf(403));
     }
 }

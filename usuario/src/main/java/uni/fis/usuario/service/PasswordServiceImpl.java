@@ -29,7 +29,7 @@ public class PasswordServiceImpl implements PasswordService {
         // Buscamos el usuario
         var usuario = userRepository.findByEmail(email);
         if (usuario.isEmpty()) {
-            throw UserNotFoundException.byEmail(email);
+            throw UserNotFoundException.byEmail(email);  // ← 404
         }
 
         // Buscamos la última contraseña
@@ -42,14 +42,9 @@ public class PasswordServiceImpl implements PasswordService {
         boolean isValid = passwordEncoder.matches(password, ultima.get().getChars());
 
         if (!isValid) {
-            throw InvalidCredentialsException.invalid();
+            throw InvalidCredentialsException.invalid();  // ← 401
         }
 
         return true;
-    }
-
-    // Método adicional para encriptar contraseñas (útil para el UserService)
-    public String encodePassword(String rawPassword) {
-        return passwordEncoder.encode(rawPassword);
     }
 }
