@@ -48,16 +48,4 @@ public class UserController {
                 ));
     }
 
-    @PostMapping()
-    public ResponseEntity<ApiResponse<TokenResponse>> create(@RequestBody UserRequest request) {
-        try {
-            UserDto userDto = userService.save(request);
-            return ResponseEntity.ok(ApiResponse.success("Usuario creado exitosamente",
-                    new TokenResponse(userDto.id(), userDto.idRol())));
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body( // ← 400 para errores de validación
-                    ApiResponse.error("Error al crear usuario: " + e.getMessage(), 400)
-            );
-        }
-    }
 }
