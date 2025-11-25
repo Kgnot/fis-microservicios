@@ -43,7 +43,8 @@ public class UserMSRepositoryMS implements UserMSRepository {
                     .exchange(UserEndpoint.POST_USER_VALIDATE.getEndpoint(),
                             HttpMethod.POST,
                             requestEntity,
-                            new ParameterizedTypeReference<>() {});
+                            new ParameterizedTypeReference<>() {
+                            });
 
             if (!response.getStatusCode().is2xxSuccessful() || !response.hasBody()) {
                 throw NoUserFoundError.of("Respuesta inválida del servicio de usuarios");
@@ -58,7 +59,7 @@ public class UserMSRepositoryMS implements UserMSRepository {
 
         } catch (HttpClientErrorException e) {
             errorHandler.handleHttpError(e, new UserValidateRequest(email, password));
-            return null; // Nunca llega aquí
+            return null; // no llega
         } catch (Exception e) {
             throw NoUserFoundError.of("Error al validar usuario: " + e.getMessage());
         }
@@ -66,12 +67,22 @@ public class UserMSRepositoryMS implements UserMSRepository {
 
     @Override
     public TokenRequest registerUser(SignIn signIn) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth("admin", "admin123");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<SignIn> signInHttp = new HttpEntity<>(
+                signIn,
+                headers
+        );
+
         try {
             ResponseEntity<ApiResponse<TokenRequest>> response = restTemplate.exchange(
                     UserEndpoint.POST_USER_CREATE.getEndpoint(),
                     HttpMethod.POST,
-                    new HttpEntity<>(signIn),
-                    new ParameterizedTypeReference<>() {}
+                    signInHttp,
+                    new ParameterizedTypeReference<>() {
+                    }
             );
 
             if (response.getBody() == null || response.getBody().getData() == null) {
@@ -86,5 +97,37 @@ public class UserMSRepositoryMS implements UserMSRepository {
         } catch (Exception e) {
             throw new RuntimeException("Error de comunicación: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Integer findUserIdByEmail(String email) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth("admin", "admin123");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> signInHttp = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<ApiResponse<Integer>> response = restTemplate
+                    .exchange(
+                            UserEndpoint.GET_USER_ID_BY_EMAIL.getEndpoint() + "{email}",
+                            HttpMethod.GET,
+                            signInHttp,
+                            new ParameterizedTypeReference<>() {
+                            },
+                            email // Parametro para {email}
+                    );
+            assert response.getBody() != null;
+            if (response.getBody().getData() == null) {
+                throw NoUserFoundError.of("No se encontró el usuario con el email designado");
+            }
+            return response.getBody().getData();
+        } catch (HttpClientErrorException e) {
+            errorHandler.handleHttpError(e, email);
+            return null; // Nunca llega aquí
+        } catch (Exception e) {
+            throw new RuntimeException("Error de comunicación: " + e.getMessage());
+        }
+
     }
 }
