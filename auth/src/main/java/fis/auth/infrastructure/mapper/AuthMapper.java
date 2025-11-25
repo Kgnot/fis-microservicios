@@ -23,7 +23,8 @@ public class AuthMapper {
                 signInRequest.strikes() != null ? signInRequest.strikes() : 0, // Default 0
                 signInRequest.idRol(),
                 signInRequest.idMultimedia(), // Si puede ser null
-                signInRequest.password()
+                signInRequest.password(),
+                signInRequest.emailTutor()
         );
     }
 }

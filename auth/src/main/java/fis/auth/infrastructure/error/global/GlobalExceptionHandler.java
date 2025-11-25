@@ -1,10 +1,12 @@
 package fis.auth.infrastructure.error.global;
 
+import fis.auth.application.error.MessageSendException;
 import fis.auth.domain.error.InvalidCredentialsException;
 import fis.auth.domain.error.InvalidIdentificationException;
 import fis.auth.domain.error.MissingRequiredFieldException;
 import fis.auth.domain.error.TutorApprovalPendingException;
 import fis.auth.infrastructure.dto.response.api.ApiResponse;
+import fis.auth.infrastructure.error.EmailApiErrorException;
 import fis.auth.infrastructure.error.NoUserFoundError;
 import fis.auth.infrastructure.error.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleGenericException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("Error interno del servidor", 500));
+                .body(ApiResponse.error("Error interno del servidor " + ex.getMessage(), 500));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -65,6 +67,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleInvalidIdentification(InvalidIdentificationException ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY) // 422
                 .body(ApiResponse.error(ex.getMessage(), 422));
+    }
+
+    @ExceptionHandler(EmailApiErrorException.class)
+    public ResponseEntity<ApiResponse<?>> handleEmailApiErrorException(EmailApiErrorException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) //500
+                .body(ApiResponse.info(ex.getMessage(), 500));
+    }
+
+    @ExceptionHandler(MessageSendException.class)
+    public ResponseEntity<ApiResponse<?>> handleMessageSendException(MessageSendException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT) //409
+                .body(ApiResponse.info(ex.getMessage(), 409));
     }
 
 }

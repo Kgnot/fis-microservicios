@@ -23,4 +23,15 @@ public class RestConfiguration {
                 .build();
     }
 
+    @Bean
+    @Qualifier("email-ms")
+    public RestTemplate getRestTemplateEmailMs(RestTemplateBuilder builder) {
+        String baseUrl = "http://fis-email:8083";
+        return builder
+                .rootUri(baseUrl)
+                .connectTimeout(Duration.ofSeconds(10))
+                .readTimeout(Duration.ofSeconds(30))
+                .build();
+    }
+
 }
