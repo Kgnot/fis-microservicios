@@ -20,7 +20,6 @@ import uni.fis.email.dto.EmailResponse;
 import uni.fis.email.entity.EmailLog;
 import uni.fis.email.service.EmailService;
 
-
 @RestController
 @RequestMapping("/api/email")
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class EmailController {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
-            
+
             System.out.println("Usuario autenticado: " + username);
             System.out.println("Roles: " + authentication.getAuthorities());
 
@@ -48,14 +47,12 @@ public class EmailController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of(
                             "error", "Datos inválidos",
-                            "message", e.getMessage()
-                    ));
+                            "message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
                             "error", "Error al procesar la solicitud",
-                            "message", e.getMessage()
-                    ));
+                            "message", e.getMessage()));
         }
     }
 

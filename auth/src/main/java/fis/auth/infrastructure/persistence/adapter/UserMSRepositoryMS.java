@@ -22,7 +22,7 @@ public class UserMSRepositoryMS implements UserMSRepository {
     private final UserMSErrorHandler errorHandler;
 
     public UserMSRepositoryMS(@Qualifier("user-ms") RestTemplate restTemplate,
-                              UserMSErrorHandler errorHandler) {
+            UserMSErrorHandler errorHandler) {
         this.restTemplate = restTemplate;
         this.errorHandler = errorHandler;
     }
@@ -35,8 +35,7 @@ public class UserMSRepositoryMS implements UserMSRepository {
 
         HttpEntity<UserValidateRequest> requestEntity = new HttpEntity<>(
                 new UserValidateRequest(email, password),
-                headers
-        );
+                headers);
 
         try {
             ResponseEntity<ApiResponse<TokenRequest>> response = restTemplate
@@ -73,8 +72,7 @@ public class UserMSRepositoryMS implements UserMSRepository {
 
         HttpEntity<SignIn> signInHttp = new HttpEntity<>(
                 signIn,
-                headers
-        );
+                headers);
 
         try {
             ResponseEntity<ApiResponse<TokenRequest>> response = restTemplate.exchange(
@@ -82,8 +80,7 @@ public class UserMSRepositoryMS implements UserMSRepository {
                     HttpMethod.POST,
                     signInHttp,
                     new ParameterizedTypeReference<>() {
-                    }
-            );
+                    });
 
             if (response.getBody() == null || response.getBody().getData() == null) {
                 throw new RuntimeException("Respuesta vacía del servicio de usuarios");
@@ -110,7 +107,7 @@ public class UserMSRepositoryMS implements UserMSRepository {
         try {
             ResponseEntity<ApiResponse<Integer>> response = restTemplate
                     .exchange(
-                            UserEndpoint.GET_USER_ID_BY_EMAIL.getEndpoint() + "{email}",
+                            UserEndpoint.GET_USER_ID_BY_EMAIL.getEndpoint() + "/{email}",
                             HttpMethod.GET,
                             signInHttp,
                             new ParameterizedTypeReference<>() {
