@@ -33,6 +33,20 @@ services:
     networks:
       - fis-network
 
+  email:
+    build: ./email
+    container_name: fis-email
+    ports:
+      - "8083:8083"
+    environment:
+      SERVER_PORT: 8083
+      DATABASE_URL: jdbc:postgresql://ep-polished-cherry-ah1a56yk-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require
+      DATABASE_USERNAME: neondb_owner
+      DATABASE_PASSWORD: npg_DIVZBu65hQzb
+      SECRET_KEY: qCgc0FE5I486aCvaA0LC/7Z91USA6SNqHZ8qmqyUNoT809d0AP4qJ9CazVaW9uLr
+    networks:
+      - fis-network
+
   nginx:
     image: nginx:alpine
     container_name: fis-nginx
