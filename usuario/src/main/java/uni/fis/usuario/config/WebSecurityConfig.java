@@ -29,7 +29,7 @@ public class WebSecurityConfig {
     @Order(1)
     public SecurityFilterChain basicAuthSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/v1/validate/**")
+                .securityMatcher("/api/v1/validate/**", "/api/v1/users/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated()  // ← Cambia a esto
@@ -53,7 +53,7 @@ public class WebSecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
+        // TODO: Aquí falta añadir el JWT
         return http.build();
     }
 
