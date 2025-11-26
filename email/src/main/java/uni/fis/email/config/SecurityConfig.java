@@ -3,6 +3,7 @@ package uni.fis.email.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,6 +27,7 @@ public class SecurityConfig {
     private String password;
 
     @Bean
+    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -44,6 +46,19 @@ public class SecurityConfig {
             .httpBasic(Customizer.withDefaults());
 
         return http.build();
+    }
+    @Bean
+    @Order(2)
+    public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity http) throws Exception {
+            return http
+                        .securityMatcher("/actuator/") 
+                            .authorizeHttpRequests(auth -> auth
+                                            .anyRequest().permitAll()
+                        )
+                            .csrf(csrf -> csrf.disable())
+                            .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                            .build();
     }
 
     @Bean
