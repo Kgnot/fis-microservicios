@@ -16,6 +16,12 @@ services:
       DATABASE_USERNAME: neondb_owner
       DATABASE_PASSWORD: npg_DIVZBu65hQzb
       SECRET_KEY: qCgc0FE5I486aCvaA0LC/7Z91USA6SNqHZ8qmqyUNoT809d0AP4qJ9CazVaW9uLr
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     networks:
       - fis-network
 
@@ -30,6 +36,12 @@ services:
       DATABASE_USERNAME: neondb_owner
       DATABASE_PASSWORD: npg_DIVZBu65hQzb
       SECRET_KEY: qCgc0FE5I486aCvaA0LC/7Z91USA6SNqHZ8qmqyUNoT809d0AP4qJ9CazVaW9uLr
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8093/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     networks:
       - fis-network
 
@@ -44,6 +56,32 @@ services:
       DATABASE_USERNAME: neondb_owner
       DATABASE_PASSWORD: npg_DIVZBu65hQzb
       SECRET_KEY: qCgc0FE5I486aCvaA0LC/7Z91USA6SNqHZ8qmqyUNoT809d0AP4qJ9CazVaW9uLr
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8083/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - fis-network
+
+  vehiculo:
+    build: ./vehiculo
+    container_name: fis-vehiculo
+    ports:
+      - "8094:8094"
+    environment:
+      SERVER_PORT: 8094
+      DATABASE_URL: jdbc:postgresql://ep-polished-cherry-ah1a56yk-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require
+      DATABASE_USERNAME: neondb_owner
+      DATABASE_PASSWORD: npg_DIVZBu65hQzb
+      SECRET_KEY: qCgc0FE5I486aCvaA0LC/7Z91USA6SNqHZ8qmqyUNoT809d0AP4qJ9CazVaW9uLr
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8094/actuator/health" ]
+      interval: 25s
+      timeout: 10s
+      retries: 4
+      start_period: 30s
     networks:
       - fis-network
 
@@ -55,8 +93,72 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - auth
-      - usuario
-      - email
+      auth:
+        condition: service_healthy
+      usuario:
+        condition: service_healthy
+      email:
+        condition: service_healthy
+      vehiculo:
+        condition: service_healthy
+    networks:
+      - fis-network
+
+  # Observability Stack
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: fis-nginx-exporter
+    command:
+      - -nginx.scrape-uri
+      - http://nginx:80/stub_status
+    ports:
+      - "9113:9113"
+    depends_on:
+      - nginx
+    networks:
+      - fis-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: fis-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - fis-network
+
+  loki:
+    image: grafana/loki:latest
+    container_name: fis-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - fis-network
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: fis-promtail
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./promtail-config.yaml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - fis-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: fis-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+      - loki
     networks:
       - fis-network
