@@ -3,13 +3,13 @@ package uni.fis.vehiculo.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uni.fis.vehiculo.dto.response.api.ApiResponse;
 import uni.fis.vehiculo.entities.VehiculoEntity;
 import uni.fis.vehiculo.services.VehiculoService;
+
+import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -33,5 +33,14 @@ public class VehiculoController {
         );
     }
 
-
+    // obtener los vehiculos por id de usuario
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<List<VehiculoEntity>>> getVehiculosByUserId(@PathVariable Integer id) {
+        return Optional.of(ResponseEntity.ok(
+                ApiResponse.success("Se obtuvieron correctamente los vehiculos del usuario " + id,
+                        vehiculoService.findVehiculosByUserId(id))
+        )).orElse(ResponseEntity.status(400).body(
+                ApiResponse.error("Hubo algun error al obtener vehiculos", 400)
+        ));
+    }
 }

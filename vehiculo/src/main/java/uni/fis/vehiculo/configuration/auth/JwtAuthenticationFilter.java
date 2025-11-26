@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -31,8 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-
+            log.info("Entramos al if por lo que si tiene bearer");
             if (jwtUtil.validateToken(token)) {
+                log.info("se pudo validar :D");
                 var claims = jwtUtil.extractClaims(token);
                 String username = claims.getSubject();
 
@@ -44,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         null,
                         authorities
                 );
-
+                log.info("La autenticación tenemos: {} ,{}", username, authorities);
                 // Establecer en el contexto de seguridad
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
@@ -54,6 +57,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private List<SimpleGrantedAuthority> getAuthoritiesFromClaims(io.jsonwebtoken.Claims claims) {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+        return Collections.singletonList(new SimpleGrantedAuthority(claims.getSubject()));
     }
 }
