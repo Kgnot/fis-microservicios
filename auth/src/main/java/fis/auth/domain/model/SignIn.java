@@ -11,7 +11,8 @@ public record SignIn(
         Integer strikes,
         Integer idRol,
         Integer idMultimedia,
-        String password
+        String password,
+        String emailTutor
 ) {
 
     public SignIn withPassword(String newPassword) {
@@ -26,7 +27,8 @@ public record SignIn(
                 this.strikes,
                 this.idRol,
                 this.idMultimedia,
-                newPassword
+                newPassword,
+                null // este es completamente normal que sea nuelo
         );
     }
 }
