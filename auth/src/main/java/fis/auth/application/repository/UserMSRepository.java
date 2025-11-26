@@ -12,4 +12,8 @@ public interface UserMSRepository {
     TokenRequest registerUser(
             SignIn signIn
     );
+
+    Integer findUserIdByEmail(
+            String email
+    );
 }
