@@ -1,29 +1,28 @@
 package uni.fis.email.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import lombok.RequiredArgsConstructor;
-import uni.fis.email.security.JwtAuthenticationFilter;
-
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
-@EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Value("${app.security.username}")
+    private String username;
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Value("${app.security.password}")
+    private String password;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,31 +33,29 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
             .authorizeHttpRequests(auth -> auth
-                
-                .requestMatchers("POST", "/api/email/send")
-                    .hasRole("ADMIN")
-                
-                .requestMatchers("GET", "/api/email/logs")
-                    .hasRole("ADMIN")
-                
-                .requestMatchers("GET", "/api/email/logs/recipient/**")
-                    .hasRole("ADMIN")
-                
-                .requestMatchers("GET", "/api/email/logs/user/**")
-                    .hasRole("ADMIN")
-                
-                .requestMatchers("GET", "/api/email/logs/status/**")
-                    .hasRole("ADMIN")
-                
-                .requestMatchers("GET", "/api/email/health")
-                    .permitAll()
-                
-                .anyRequest()
-                    .hasRole("ADMIN")
+                .requestMatchers("/api/email/health").permitAll()
+                .requestMatchers("/api/email/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
             )
             
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .httpBasic(basic -> {});  // Habilitar HTTP Basic Authentication
 
         return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails admin = User.builder()
+                .username(username)
+                .password(passwordEncoder().encode(password))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
