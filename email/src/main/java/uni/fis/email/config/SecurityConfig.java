@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             
-            .httpBasic(basic -> {});  // Habilitar HTTP Basic Authentication
+            .httpBasic(basic -> {}); 
 
         return http.build();
     }
