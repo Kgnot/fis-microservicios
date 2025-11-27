@@ -36,7 +36,8 @@ public class ItemServiceImp implements ItemService {
                 .cantidad((int)productoRequest.getCantidad())
                 .tamano(productoRequest.getTamaño())
                 .peso(productoRequest.getPeso())
-                .color(productoRequest.getColor())
+                .id_color(productoRequest.getId_color())
+                .id_unidad_peso(productoRequest.getId_unidad_peso())
                 .build();
         productoRepository.save(producto);
         return producto.getId();
@@ -57,7 +58,8 @@ public class ItemServiceImp implements ItemService {
                 .cantidad(producto.getCantidad())
                 .tamaño(producto.getTamano())
                 .peso(producto.getPeso())
-                .color(producto.getColor())
+                .id_color(producto.getId_color())
+                .id_unidad_peso(producto.getId_unidad_peso())
                 .build();
     }
     @Override
