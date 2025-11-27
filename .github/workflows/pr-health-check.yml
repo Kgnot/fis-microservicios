@@ -1,0 +1,126 @@
+name: PR Health Check
+
+on:
+  pull_request:
+    branches: [ "desarrollo" ]
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Create .env file
+      run: |
+        echo "Creating .env file..."
+        {
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
+          echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}"
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}"
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}"
+          echo "HTTP_BASIC_USER=${{ secrets.HTTP_BASIC_USER }}"
+          echo "HTTP_BASIC_PASSWORD=${{ secrets.HTTP_BASIC_PASSWORD }}"
+          echo "SERVER_PORT=8080"
+        } >> .env
+
+    - name: Detect modified microservices
+      id: detection
+      run: |
+        echo "Detecting modified microservices..."
+
+        # Get directories changed in the PR
+        changed_dirs=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | cut -d/ -f1 | sort | uniq)
+
+        affected=""
+
+        for dir in $changed_dirs; do
+          if [ -f "$dir/Dockerfile" ]; then
+            echo "Detected modified service: $dir"
+            affected="$affected $dir"
+          fi
+        done
+
+        if [ -z "$affected" ]; then
+          echo "No microservices modified. Exiting workflow early."
+          echo "affected_services=" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        echo "Affected services: $affected"
+        echo "affected_services=$affected" >> $GITHUB_OUTPUT
+
+    - name: Validate modified services exist in docker-compose.yml
+      if: steps.detection.outputs.affected_services != ''
+      run: |
+        echo "Validating modified services exist in docker-compose.yml..."
+
+        defined_services=$(grep "^  [a-z]" docker-compose.yml | sed 's/://' | sed 's/  //')
+
+        for srv in ${{ steps.detection.outputs.affected_services }}; do
+          echo "Checking service: $srv"
+          if echo "$defined_services" | grep -q "^$srv$"; then
+            echo "OK: $srv is defined in docker-compose.yml"
+          else
+            echo "ERROR: $srv is NOT defined in docker-compose.yml"
+            exit 1
+          fi
+        done
+
+    - name: Start only affected services
+      if: steps.detection.outputs.affected_services != ''
+      run: |
+        echo "Starting affected services only..."
+        docker-compose up -d --build ${{ steps.detection.outputs.affected_services }}
+
+    - name: Wait for healthchecks of affected services
+      if: steps.detection.outputs.affected_services != ''
+      timeout-minutes: 5
+      run: |
+        echo "Waiting for health of affected services..."
+
+        for srv in ${{ steps.detection.outputs.affected_services }}; do
+          echo "Checking $srv..."
+
+          # Get container ID
+          container=$(docker-compose ps -q $srv)
+
+          if [ -z "$container" ]; then
+            echo "ERROR: Service $srv did not start correctly."
+            exit 1
+          fi
+
+          echo "Container ID: $container"
+
+          # Detect if it has healthcheck
+          health=$(docker inspect --format '{{.State.Health.Status}}' "$container" 2>/dev/null || echo "none")
+
+          if [ "$health" = "none" ]; then
+            echo "ERROR: Service $srv has NO healthcheck. Add HEALTHCHECK to its Dockerfile."
+            exit 1
+          fi
+
+          # Wait for healthy
+          retries=0
+          max_retries=24 # 24 * 5s = 120 seconds
+
+          until [ "$health" = "healthy" ]; do
+            echo "Waiting for $srv (status: $health)..."
+            sleep 5
+            retries=$((retries+1))
+            health=$(docker inspect --format '{{.State.Health.Status}}' "$container")
+
+            if [ $retries -ge $max_retries ]; then
+              echo "ERROR: $srv did NOT become healthy in time."
+              docker logs "$container" --tail 50
+              exit 1
+            fi
+          done
+
+          echo "OK: $srv is healthy"
+        done
+
+        echo "SUCCESS: All modified services are healthy!"
