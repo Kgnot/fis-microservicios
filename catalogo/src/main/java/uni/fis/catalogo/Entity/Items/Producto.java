@@ -48,7 +48,7 @@ public class Producto {
     @Column(name = "valoracion")
     private BigDecimal valoracion;
     
-    @Column(name = "estado", nullable = false)
+    @Column(name = "activo", nullable = false)
     private boolean disponible;
     
     @Column(name = "cantidad", table = "producto", nullable = false)
