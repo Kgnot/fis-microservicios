@@ -33,16 +33,13 @@ public class CatalogoOwnershipFilter extends OncePerRequestFilter {
         
         log.info("=== OWNERSHIP FILTER === Path: {}, Method: {}", path, method);
         
-        // Lista de endpoints que requieren verificación
         boolean requiresOwnershipCheck = 
+            (method.equals("POST") && path.matches(".*/api/catalogo/crear.*")) ||
             (method.equals("POST") && path.matches(".*/api/catalogo/\\d+/producto.*")) ||
             (method.equals("POST") && path.matches(".*/api/catalogo/\\d+/servicio.*")) ||
-            (method.equals("GET") && path.matches(".*/\\d+/producto/\\d+.*")) ||
-            (method.equals("GET") && path.matches(".*/\\d+/servicio/\\d+.*")) ||
-            (method.equals("DELETE") && path.matches(".*/\\d+/producto/\\d+/eliminar.*")) ||
-            (method.equals("DELETE") && path.matches(".*/\\d+/servicio/\\d+/eliminar.*")) ||
-            (method.equals("DELETE") && path.matches(".*/api/catalogo/\\d+.*")) ||
-            (method.equals("GET") && path.matches(".*/api/catalogo/\\d+.*"));
+            (method.equals("DELETE") && path.matches(".*/api/catalogo/\\d+/producto/\\d+/eliminar.*")) ||
+            (method.equals("DELETE") && path.matches(".*/api/catalogo/\\d+/servicio/\\d+/eliminar.*")) ||
+            (method.equals("DELETE") && path.matches(".*/api/catalogo/\\d+/eliminar.*"));
 
         if (!requiresOwnershipCheck) {
             log.info("No requiere verificación de ownership, continuando...");
@@ -51,7 +48,6 @@ public class CatalogoOwnershipFilter extends OncePerRequestFilter {
         }
 
         try {
-            // Obtener el userId del token
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             
             if (authentication == null) {
@@ -77,7 +73,12 @@ public class CatalogoOwnershipFilter extends OncePerRequestFilter {
             
             log.info("UserId del token: {}", userId);
 
-            // Extraer catalogoId de la URL
+            if (method.equals("POST") && path.matches(".*/api/catalogo/crear.*")) {
+                log.info("Creación de catálogo, sin verificación de ownership previo");
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             Integer catalogoId = extractCatalogoId(path);
             
             if (catalogoId == null) {
@@ -90,7 +91,6 @@ public class CatalogoOwnershipFilter extends OncePerRequestFilter {
             
             log.info("CatalogoId extraído: {}", catalogoId);
 
-            // Verificar que el catálogo pertenece al usuario
             var catalogoOpt = catalogoRepository.findById(catalogoId);
             
             if (catalogoOpt.isEmpty()) {
@@ -107,12 +107,12 @@ public class CatalogoOwnershipFilter extends OncePerRequestFilter {
             log.info("IdProveedor del catálogo: {}", idProveedor);
             log.info("Comparando userId {} con idProveedor {}", userId, idProveedor);
 
-            if (!(idProveedor == userId)) {
+            if (!idProveedor.equals(userId)) {
                 log.warn("Usuario {} intentó acceder al catálogo {} que pertenece al proveedor {}", 
                          userId, catalogoId, idProveedor);
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.setContentType("application/json");
-                response.getWriter().write("{\"error\": \"No tienes permiso para acceder a este catálogo\"}");
+                response.getWriter().write("{\"error\": \"No tienes permiso para modificar este catálogo\"}");
                 return;
             }
             
@@ -139,22 +139,21 @@ public class CatalogoOwnershipFilter extends OncePerRequestFilter {
         try {
             log.debug("Extrayendo catalogoId de: {}", path);
             
-            // Patrón 1: /api/catalogo/{catalogoId}/...
             if (path.contains("/api/catalogo/")) {
                 String[] parts = path.split("/");
                 for (int i = 0; i < parts.length; i++) {
                     if (parts[i].equals("catalogo") && i + 1 < parts.length) {
                         String catalogoIdStr = parts[i + 1];
-                        log.debug("Encontrado catalogoId después de 'catalogo': {}", catalogoIdStr);
-                        return Integer.parseInt(catalogoIdStr);
+                        if (!catalogoIdStr.equals("crear") && catalogoIdStr.matches("\\d+")) {
+                            log.debug("Encontrado catalogoId después de 'catalogo': {}", catalogoIdStr);
+                            return Integer.parseInt(catalogoIdStr);
+                        }
                     }
                 }
             }
             
-            // Patrón 2: /{catalogoId}/producto/... o /{catalogoId}/servicio/...
             String[] parts = path.split("/");
             if (parts.length > 1) {
-                // Buscar el primer número en la ruta
                 for (String part : parts) {
                     if (!part.isEmpty() && part.matches("\\d+")) {
                         log.debug("Encontrado primer número en la ruta: {}", part);

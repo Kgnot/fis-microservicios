@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import uni.fis.catalogo.Security.CatalogoOwnershipFilter;
 import uni.fis.catalogo.Security.JwtAuthenticationFilter;
 
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -29,41 +28,61 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
             .authorizeHttpRequests(auth -> auth
+                // Consultar catálogo por ID
+                .requestMatchers("GET", "/api/catalogo/{id}")
+                    .permitAll()
                 
+                // Listar productos de un catálogo
+                .requestMatchers("GET", "/api/catalogo/{catalogoId}/listaProductos")
+                    .permitAll()
+                
+                // Listar servicios de un catálogo
+                .requestMatchers("GET", "/api/catalogo/{catalogoId}/listaServicios")
+                    .permitAll()
+                
+                // Obtener producto específico
+                .requestMatchers("GET", "/api/catalogo/{idCatalogo}/producto/{id}")
+                    .permitAll()
+                
+                // Obtener servicio específico
+                .requestMatchers("GET", "/api/catalogo/{idCatalogo}/servicio/{id}")
+                    .permitAll()
+                
+                // Calificar producto
+                .requestMatchers("POST", "/api/catalogo/producto/{id}/calificar")
+                    .permitAll()
+                
+                // Calificar servicio
+                .requestMatchers("POST", "/api/catalogo/servicio/{id}/calificar")
+                    .permitAll()
+                
+                // Crear catálogo
                 .requestMatchers("POST", "/api/catalogo/crear")
                     .hasRole("PROVEEDOR")
                 
-                .requestMatchers("POST", "/api/catalogo/{catalogoId}/producto")
-                    .hasRole("PROVEEDOR")
-                    
-                .requestMatchers("POST", "/api/catalogo/{catalogoId}/servicio")
-                    .hasRole("PROVEEDOR")
-                    
-                .requestMatchers("GET", "/{idCatalogo}/producto/{id}")
-                    .hasRole("PROVEEDOR")
-                    
-                .requestMatchers("GET", "/{idCatalogo}/servicio/{id}")
-                    .hasRole("PROVEEDOR")
-                    
-                .requestMatchers("DELETE", "/{idCatalogo}/producto/{id}/eliminar")
+                // Eliminar catálogo
+                .requestMatchers("DELETE", "/api/catalogo/{id}/eliminar")
                     .hasRole("PROVEEDOR")
                 
-                .requestMatchers("DELETE", "/{idCatalogo}/servicio/{id}/eliminar")
+                // Agregar producto al catálogo
+                .requestMatchers("POST", "/api/catalogo/{catalogoId}/producto")
                     .hasRole("PROVEEDOR")
-                    
-                .requestMatchers("DELETE", "/api/catalogo/{id}")
+                
+                // Agregar servicio al catálogo
+                .requestMatchers("POST", "/api/catalogo/{catalogoId}/servicio")
                     .hasRole("PROVEEDOR")
-
-                .requestMatchers("GET", "/api/catalogo/{catalogoId}/listaProductos")
-                    .permitAll()
-                .requestMatchers("GET", "/api/catalogo/{catalogoId}/listaServicios")
-                    .permitAll()
-                .requestMatchers("POST", "/api/catalogo/producto/{id}/calificar")
-                    .permitAll()
-                .requestMatchers("POST", "/api/catalogo/servicio/{id}/calificar")
-                    .permitAll()
+                
+                // Eliminar producto
+                .requestMatchers("DELETE", "/api/catalogo/{idCatalogo}/producto/{id}/eliminar")
+                    .hasRole("PROVEEDOR")
+                
+                // Eliminar servicio
+                .requestMatchers("DELETE", "/api/catalogo/{idCatalogo}/servicio/{id}/eliminar")
+                    .hasRole("PROVEEDOR")
+                
+                // Cualquier otra petición requiere autenticación
                 .anyRequest()
-                    .hasRole("PROVEEDOR")
+                    .authenticated()
             )
             
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
