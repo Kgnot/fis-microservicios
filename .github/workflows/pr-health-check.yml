@@ -12,89 +12,115 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # Needed for git diff
+        fetch-depth: 0
 
     - name: Create .env file
       run: |
-        echo "Creating .env file from secrets or defaults..."
-        cat <<EOF > .env
-        DATABASE_URL=${{ secrets.DATABASE_URL || 'jdbc:postgresql://ep-polished-cherry-ah1a56yk-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require' }}
-        DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME || 'neondb_owner' }}
-        DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD || 'npg_DIVZBu65hQzb' }}
-        SECRET_KEY=${{ secrets.SECRET_KEY || 'qCgc0FE5I486aCvaA0LC/7Z91USA6SNqHZ8qmqyUNoT809d0AP4qJ9CazVaW9uLr' }}
-        HTTP_BASIC_USER=${{ secrets.HTTP_BASIC_USER || 'admin' }}
-        HTTP_BASIC_PASSWORD=${{ secrets.HTTP_BASIC_PASSWORD || 'password' }}
-        SERVER_PORT=8080 # Default, overridden by docker-compose per service
-        EOF
+        echo "Creating .env file..."
+        {
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
+          echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}"
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}"
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}"
+          echo "HTTP_BASIC_USER=${{ secrets.HTTP_BASIC_USER }}"
+          echo "HTTP_BASIC_PASSWORD=${{ secrets.HTTP_BASIC_PASSWORD }}"
+          echo "SERVER_PORT=8080"
+        } >> .env
 
-    - name: Start Docker Environment
+    - name: Detect modified microservices
+      id: detection
       run: |
-        echo "Starting services..."
-        docker-compose up -d --build
+        echo "Detecting modified microservices..."
 
-    - name: Wait for Services Health
-      timeout-minutes: 5
+        # Get directories changed in the PR
+        changed_dirs=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | cut -d/ -f1 | sort | uniq)
+
+        affected=""
+
+        for dir in $changed_dirs; do
+          if [ -f "$dir/Dockerfile" ]; then
+            echo "Detected modified service: $dir"
+            affected="$affected $dir"
+          fi
+        done
+
+        if [ -z "$affected" ]; then
+          echo "No microservices modified. Exiting workflow early."
+          echo "affected_services=" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        echo "Affected services: $affected"
+        echo "affected_services=$affected" >> $GITHUB_OUTPUT
+
+    - name: Validate modified services exist in docker-compose.yml
+      if: steps.detection.outputs.affected_services != ''
       run: |
-        echo "Waiting for services to be healthy..."
-        
-        # Get all container IDs
-        containers=$(docker-compose ps -q)
-        
-        for container in $containers; do
-          name=$(docker inspect --format '{{.Name}}' $container | sed 's/\///')
-          echo "Checking health of $name..."
-          
-          # Loop until healthy or timeout
-          retries=0
-          max_retries=30 # 30 * 10s = 5 minutes
-          
-          while [ $retries -lt $max_retries ]; do
-            health_status=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' $container)
-            
-            if [ "$health_status" == "healthy" ]; then
-              echo "OK: $name is healthy"
-              break
-            elif [ "$health_status" == "none" ]; then
-              echo "INFO: $name has no healthcheck, skipping."
-              break
-            else
-              echo "WAIT: $name is $health_status... ($retries/$max_retries)"
-              sleep 10
-              retries=$((retries+1))
-            fi
-          done
-          
-          if [ $retries -eq $max_retries ]; then
-            echo "ERROR: $name failed to become healthy."
-            docker logs $container --tail 50
+        echo "Validating modified services exist in docker-compose.yml..."
+
+        defined_services=$(grep "^  [a-z]" docker-compose.yml | sed 's/://' | sed 's/  //')
+
+        for srv in ${{ steps.detection.outputs.affected_services }}; do
+          echo "Checking service: $srv"
+          if echo "$defined_services" | grep -q "^$srv$"; then
+            echo "OK: $srv is defined in docker-compose.yml"
+          else
+            echo "ERROR: $srv is NOT defined in docker-compose.yml"
             exit 1
           fi
         done
-        echo "SUCCESS: All services are healthy!"
 
-    - name: Validate Modified Services
+    - name: Start only affected services
+      if: steps.detection.outputs.affected_services != ''
       run: |
-        echo "Verifying that modified microservices are defined in docker-compose.yml..."
-        
-        # Get list of changed top-level directories
-        changed_dirs=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | cut -d/ -f1 | sort | uniq)
-        
-        # Parse docker-compose services (simple grep approximation)
-        defined_services=$(grep "^  [a-z]" docker-compose.yml | sed 's/://' | sed 's/  //')
-        
-        for dir in $changed_dirs; do
-          # Check if directory has a Dockerfile (implies it's a service)
-          if [ -f "$dir/Dockerfile" ]; then
-            echo "Checking if service '$dir' is in docker-compose.yml..."
-            
-            # Check if the directory name matches a service name
-            if echo "$defined_services" | grep -q "^$dir$"; then
-              echo "OK: Service '$dir' is defined."
-            else
-              echo "ERROR: Directory '$dir' contains a Dockerfile but is NOT defined as a service in docker-compose.yml."
-              echo "Please add '$dir' to docker-compose.yml."
+        echo "Starting affected services only..."
+        docker-compose up -d --build ${{ steps.detection.outputs.affected_services }}
+
+    - name: Wait for healthchecks of affected services
+      if: steps.detection.outputs.affected_services != ''
+      timeout-minutes: 5
+      run: |
+        echo "Waiting for health of affected services..."
+
+        for srv in ${{ steps.detection.outputs.affected_services }}; do
+          echo "Checking $srv..."
+
+          # Get container ID
+          container=$(docker-compose ps -q $srv)
+
+          if [ -z "$container" ]; then
+            echo "ERROR: Service $srv did not start correctly."
+            exit 1
+          fi
+
+          echo "Container ID: $container"
+
+          # Detect if it has healthcheck
+          health=$(docker inspect --format '{{.State.Health.Status}}' "$container" 2>/dev/null || echo "none")
+
+          if [ "$health" = "none" ]; then
+            echo "ERROR: Service $srv has NO healthcheck. Add HEALTHCHECK to its Dockerfile."
+            exit 1
+          fi
+
+          # Wait for healthy
+          retries=0
+          max_retries=24 # 24 * 5s = 120 seconds
+
+          until [ "$health" = "healthy" ]; do
+            echo "Waiting for $srv (status: $health)..."
+            sleep 5
+            retries=$((retries+1))
+            health=$(docker inspect --format '{{.State.Health.Status}}' "$container")
+
+            if [ $retries -ge $max_retries ]; then
+              echo "ERROR: $srv did NOT become healthy in time."
+              docker logs "$container" --tail 50
               exit 1
             fi
-          fi
+          done
+
+          echo "OK: $srv is healthy"
         done
-        echo "SUCCESS: All modified services are properly defined."
+
+        echo "SUCCESS: All modified services are healthy!"
