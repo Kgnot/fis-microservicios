@@ -1,0 +1,100 @@
+name: PR Health Check
+
+on:
+  pull_request:
+    branches: [ "desarrollo" ]
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Needed for git diff
+
+    - name: Create .env file
+      run: |
+        echo "Creating .env file from secrets or defaults..."
+        cat <<EOF > .env
+        DATABASE_URL=${{ secrets.DATABASE_URL || 'jdbc:postgresql://ep-polished-cherry-ah1a56yk-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require' }}
+        DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME || 'neondb_owner' }}
+        DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD || 'npg_DIVZBu65hQzb' }}
+        SECRET_KEY=${{ secrets.SECRET_KEY || 'qCgc0FE5I486aCvaA0LC/7Z91USA6SNqHZ8qmqyUNoT809d0AP4qJ9CazVaW9uLr' }}
+        HTTP_BASIC_USER=${{ secrets.HTTP_BASIC_USER || 'admin' }}
+        HTTP_BASIC_PASSWORD=${{ secrets.HTTP_BASIC_PASSWORD || 'password' }}
+        SERVER_PORT=8080 # Default, overridden by docker-compose per service
+        EOF
+
+    - name: Start Docker Environment
+      run: |
+        echo "Starting services..."
+        docker-compose up -d --build
+
+    - name: Wait for Services Health
+      timeout-minutes: 5
+      run: |
+        echo "Waiting for services to be healthy..."
+        
+        # Get all container IDs
+        containers=$(docker-compose ps -q)
+        
+        for container in $containers; do
+          name=$(docker inspect --format '{{.Name}}' $container | sed 's/\///')
+          echo "Checking health of $name..."
+          
+          # Loop until healthy or timeout
+          retries=0
+          max_retries=30 # 30 * 10s = 5 minutes
+          
+          while [ $retries -lt $max_retries ]; do
+            health_status=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' $container)
+            
+            if [ "$health_status" == "healthy" ]; then
+              echo "OK: $name is healthy"
+              break
+            elif [ "$health_status" == "none" ]; then
+              echo "INFO: $name has no healthcheck, skipping."
+              break
+            else
+              echo "WAIT: $name is $health_status... ($retries/$max_retries)"
+              sleep 10
+              retries=$((retries+1))
+            fi
+          done
+          
+          if [ $retries -eq $max_retries ]; then
+            echo "ERROR: $name failed to become healthy."
+            docker logs $container --tail 50
+            exit 1
+          fi
+        done
+        echo "SUCCESS: All services are healthy!"
+
+    - name: Validate Modified Services
+      run: |
+        echo "Verifying that modified microservices are defined in docker-compose.yml..."
+        
+        # Get list of changed top-level directories
+        changed_dirs=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | cut -d/ -f1 | sort | uniq)
+        
+        # Parse docker-compose services (simple grep approximation)
+        defined_services=$(grep "^  [a-z]" docker-compose.yml | sed 's/://' | sed 's/  //')
+        
+        for dir in $changed_dirs; do
+          # Check if directory has a Dockerfile (implies it's a service)
+          if [ -f "$dir/Dockerfile" ]; then
+            echo "Checking if service '$dir' is in docker-compose.yml..."
+            
+            # Check if the directory name matches a service name
+            if echo "$defined_services" | grep -q "^$dir$"; then
+              echo "OK: Service '$dir' is defined."
+            else
+              echo "ERROR: Directory '$dir' contains a Dockerfile but is NOT defined as a service in docker-compose.yml."
+              echo "Please add '$dir' to docker-compose.yml."
+              exit 1
+            fi
+          fi
+        done
+        echo "SUCCESS: All modified services are properly defined."
