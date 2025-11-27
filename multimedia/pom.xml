@@ -71,8 +71,15 @@
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-ftp</artifactId>
 		</dependency>
-	</dependencies>
+		<!--		JWT: -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.13.0</version>
+		</dependency>
 
+	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>
