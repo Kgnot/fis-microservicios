@@ -23,7 +23,7 @@ public class ItemServiceImp implements ItemService {
     private ProductoRepository productoRepository;
     @Autowired
     private ServicioRepository servicioRepository;
-    
+
     @Override
     public long agregarProducto(ProductoRequest productoRequest, Integer catalogoId) {
         Producto producto = Producto.builder()
@@ -31,10 +31,10 @@ public class ItemServiceImp implements ItemService {
                 .nombre(productoRequest.getNombre())
                 .precio(productoRequest.getPrecio())
                 .fechaCreacion(new Date())
-                .valoración(new BigDecimal(0))
+                .valoracion(new BigDecimal(0))
                 .disponible(true)
                 .cantidad((int)productoRequest.getCantidad())
-                .tamaño(productoRequest.getTamaño())
+                .tamano(productoRequest.getTamaño())
                 .peso(productoRequest.getPeso())
                 .color(productoRequest.getColor())
                 .build();
@@ -52,10 +52,10 @@ public class ItemServiceImp implements ItemService {
                 .nombre(producto.getNombre())
                 .precio(producto.getPrecio())
                 .fechaCreacion(producto.getFechaCreacion())
-                .valoración(producto.getValoración())
+                .valoración(producto.getValoracion())
                 .disponible(producto.isDisponible())
                 .cantidad(producto.getCantidad())
-                .tamaño(producto.getTamaño())
+                .tamaño(producto.getTamano())
                 .peso(producto.getPeso())
                 .color(producto.getColor())
                 .build();
@@ -74,7 +74,7 @@ public class ItemServiceImp implements ItemService {
                 .nombre(servicioRequest.getNombre())
                 .precio(servicioRequest.getPrecio())
                 .fechaCreacion(new Date())
-                .valoración(new BigDecimal(0))
+                .valoracion(new BigDecimal(0))
                 .disponible(true)
                 .duracion(servicioRequest.getDuracion())
                 .horario(servicioRequest.getHorario())
@@ -92,7 +92,7 @@ public class ItemServiceImp implements ItemService {
                 .nombre(servicio.getNombre())
                 .precio(servicio.getPrecio())
                 .fechaCreacion(servicio.getFechaCreacion())
-                .valoración(servicio.getValoración())
+                .valoración(servicio.getValoracion())
                 .disponible(servicio.isDisponible())
                 .duracion(servicio.getDuracion())
                 .horario(servicio.getHorario())
@@ -110,14 +110,14 @@ public class ItemServiceImp implements ItemService {
     public void calificarProducto(Integer id, BigDecimal calificacion) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Producto con el id "+ id + " no fue encontrado", "PRODUCTO_NOT_FOUND"));
-        producto.setValoración(calificacion);
+        producto.setValoracion(calificacion);
         productoRepository.save(producto);
     }   
     @Override
     public void calificarServicio(Integer id, BigDecimal calificacion) {
         Servicio servicio = servicioRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Servicio con el id "+ id + " no fue encontrado", "SERVICIO_NOT_FOUND"));
-        servicio.setValoración(calificacion);
+        servicio.setValoracion(calificacion);
         servicioRepository.save(servicio);
     }
 }
