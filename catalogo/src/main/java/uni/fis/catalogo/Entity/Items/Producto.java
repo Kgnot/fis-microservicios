@@ -60,6 +60,9 @@ public class Producto {
     @Column(name = "peso", table = "producto", nullable = false)
     private String peso;
     
-    @Column(name = "color", table = "producto", nullable = false)
-    private String color;
+    @Column(name = "id_color", table = "producto", nullable = false)
+    private Integer  id_color;
+
+    @Column(name = "id_unidad_peso", table = "producto", nullable = false)
+    private Integer id_unidad_peso;
 }

@@ -23,5 +23,6 @@ public class ProductoResponse {
     private Integer cantidad;
     private String tamaño;
     private String peso;
-    private String color;
+    private Integer id_color;
+    private Integer id_unidad_peso;
 }

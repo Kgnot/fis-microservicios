@@ -13,5 +13,6 @@ public class ProductoRequest {
     private int cantidad;
     private String tamaño;
     private String peso;
-    private String color;
+    private Integer id_color;
+    private Integer id_unidad_peso;
 }
