@@ -20,7 +20,7 @@ public class ProductoResponse {
     private Date fechaCreacion;
     private BigDecimal valoración;
     private boolean disponible;
-    private int cantidad;
+    private Integer cantidad;
     private String tamaño;
     private String peso;
     private String color;

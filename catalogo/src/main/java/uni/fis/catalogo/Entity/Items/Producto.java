@@ -22,31 +22,44 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "item")
-@SecondaryTable(name = "producto",
-                pkJoinColumns=@PrimaryKeyJoinColumn(name = "id"))
+@SecondaryTable(
+    name = "producto",
+    pkJoinColumns = @PrimaryKeyJoinColumn(name = "id")
+)
 public class Producto {
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
     @Column(name = "id")
     private Integer id;
-    @Column(name = "id_catalogo",nullable = false)
+    
+    @Column(name = "id_catalogo", nullable = false)
     private Integer idCatalogo;
+    
     @Column(name = "nombre", nullable = false)
     private String nombre;
-    @Column(name = "precio",nullable = false)
+    
+    @Column(name = "precio", nullable = false)
     private BigDecimal precio;
-    @Column(name = "fecha",nullable = false)
+    
+    @Column(name = "fecha", nullable = false)
     private Date fechaCreacion;
+    
     @Column(name = "valoracion")
-    private BigDecimal valoración;
+    private BigDecimal valoracion;
+    
     @Column(name = "estado", nullable = false)
     private boolean disponible;
+    
     @Column(name = "cantidad", table = "producto", nullable = false)
-    private int cantidad;
+    private Integer cantidad;
+    
     @Column(name = "tamano", table = "producto", nullable = false)
-    private String tamaño;
+    private String tamano;
+    
     @Column(name = "peso", table = "producto", nullable = false)
     private String peso;
+    
     @Column(name = "color", table = "producto", nullable = false)
     private String color;
 }

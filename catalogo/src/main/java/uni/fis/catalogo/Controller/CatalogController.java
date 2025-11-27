@@ -22,14 +22,13 @@ import uni.fis.catalogo.Model.ItemDto.ServicioResponse;
 import uni.fis.catalogo.Service.CatalogoService;
 import uni.fis.catalogo.Service.ItemService;
 
-
-
-
 @RestController
 @RequestMapping("api/catalogo")
 public class CatalogController {
+    
     @Autowired
     private CatalogoService catalogoService;
+    
     @Autowired
     private ItemService itemService;
 
@@ -44,66 +43,89 @@ public class CatalogController {
         CatalogoResponse catalogoResponse = catalogoService.obtenerCatalogoPorId(id);
         return new ResponseEntity<>(catalogoResponse, HttpStatus.OK);
     }
-    @GetMapping("/{catalogoId}/listaProductos")
-    public ResponseEntity<ProductoResponse[]> obtenerProductosPorCatalogoId(@PathVariable("catalogoId") Integer catalogoId) {
-        ProductoResponse[] productos = catalogoService.obtenerProductosPorCatalogoId(catalogoId);
-        return new ResponseEntity<>(productos, HttpStatus.OK);
-    }
-    @GetMapping("/{catalogoId}/listaServicios")
-    public ResponseEntity<ServicioResponse[]> obtenerServiciosPorCatalogoId(@PathVariable("catalogoId") Integer catalogoId) {
-        ServicioResponse[] servicios = catalogoService.obtenerServiciosPorCatalogoId(catalogoId);
-        return new ResponseEntity<>(servicios, HttpStatus.OK);
-    }
-
-
-    @PostMapping("/{catalogoId}/producto")
-    public ResponseEntity<Long> agregarProductoAlCatalogo(@PathVariable("catalogoId") Integer catalogoId,
-                                                          @RequestBody ProductoRequest productoRequest) {
-        System.out.println("cantidad recibida: " + productoRequest.getCantidad());
-        long productoId = itemService.agregarProducto(productoRequest, catalogoId);
-        return new ResponseEntity<>(productoId, HttpStatus.CREATED);
-    }
-
-    @GetMapping("/{idCatalogo}/producto/{id}")
-    public ResponseEntity<ProductoResponse> obtenerProductoPorId(@PathVariable("id") Integer id) {
-        ProductoResponse productoResponse = itemService.obtenerProductoPorId(id);
-        return new ResponseEntity<>(productoResponse, HttpStatus.OK);
-    }
     
-    @DeleteMapping("/{idCatalogo}/producto/{id}/eliminar")
-    public ResponseEntity<String> eliminarProductoPorId(@PathVariable("id") Integer id) {
-        itemService.eliminarProductoPorId(id);
-        return new ResponseEntity<>("Producto eliminado exitosamente", HttpStatus.OK);
-    }
-    @PostMapping("/{catalogoId}/servicio")
-    public ResponseEntity<Long> agregarServicioAlCatalogo(@PathVariable("catalogoId") Integer catalogoId,
-                                                          @RequestBody ServicioRequest servicioRequest) {
-        long servicioId = itemService.agregarServicio(servicioRequest, catalogoId);
-        return new ResponseEntity<>(servicioId, HttpStatus.CREATED);
-    }
-    @GetMapping("/{idCatalogo}/servicio/{id}")
-    public ResponseEntity<ServicioResponse> obtenerServicioPorId(@PathVariable("id") Integer id) {
-        ServicioResponse servicioResponse = itemService.obtenerServicioPorId(id);
-        return new ResponseEntity<>(servicioResponse, HttpStatus.OK);
-    }
-    @DeleteMapping("/{idCatalogo}/servicio/{id}/eliminar")
-    public ResponseEntity<String> eliminarServicioPorId(@PathVariable("id") Integer id) {
-        itemService.eliminarServicioPorId(id);
-        return new ResponseEntity<>("Servicio eliminado exitosamente", HttpStatus.OK);
-    }   
     @DeleteMapping("/{id}/eliminar")
     public ResponseEntity<String> eliminarCatalogoPorId(@PathVariable("id") Integer id) {
         catalogoService.eliminarCatalogoPorId(id);
         return new ResponseEntity<>("Catálogo eliminado exitosamente", HttpStatus.OK);
     }
+
+    @GetMapping("/{catalogoId}/listaProductos")
+    public ResponseEntity<ProductoResponse[]> obtenerProductosPorCatalogoId(
+            @PathVariable("catalogoId") Integer catalogoId) {
+        ProductoResponse[] productos = catalogoService.obtenerProductosPorCatalogoId(catalogoId);
+        return new ResponseEntity<>(productos, HttpStatus.OK);
+    }
+    
+    @GetMapping("/{idCatalogo}/producto/{id}")
+    public ResponseEntity<ProductoResponse> obtenerProductoPorId(
+            @PathVariable("idCatalogo") Integer idCatalogo,
+            @PathVariable("id") Integer id) {
+        ProductoResponse productoResponse = itemService.obtenerProductoPorId(id);
+        return new ResponseEntity<>(productoResponse, HttpStatus.OK);
+    }
+    
+    @PostMapping("/{catalogoId}/producto")
+    public ResponseEntity<Long> agregarProductoAlCatalogo(
+            @PathVariable("catalogoId") Integer catalogoId,
+            @RequestBody ProductoRequest productoRequest) {
+        System.out.println("cantidad recibida: " + productoRequest.getCantidad());
+        long productoId = itemService.agregarProducto(productoRequest, catalogoId);
+        return new ResponseEntity<>(productoId, HttpStatus.CREATED);
+    }
+    
+    @DeleteMapping("/{idCatalogo}/producto/{id}/eliminar")
+    public ResponseEntity<String> eliminarProductoPorId(
+            @PathVariable("idCatalogo") Integer idCatalogo,
+            @PathVariable("id") Integer id) {
+        itemService.eliminarProductoPorId(id);
+        return new ResponseEntity<>("Producto eliminado exitosamente", HttpStatus.OK);
+    }
+    
     @PostMapping("/producto/{id}/calificar")
-    public ResponseEntity<String> calificarProducto(@PathVariable("id") Integer id, @RequestBody BigDecimal calificacion) {
+    public ResponseEntity<String> calificarProducto(
+            @PathVariable("id") Integer id, 
+            @RequestBody BigDecimal calificacion) {
         itemService.calificarProducto(id, calificacion);
         return new ResponseEntity<>("Producto calificado exitosamente", HttpStatus.OK);
     }
+
+    @GetMapping("/{catalogoId}/listaServicios")
+    public ResponseEntity<ServicioResponse[]> obtenerServiciosPorCatalogoId(
+            @PathVariable("catalogoId") Integer catalogoId) {
+        ServicioResponse[] servicios = catalogoService.obtenerServiciosPorCatalogoId(catalogoId);
+        return new ResponseEntity<>(servicios, HttpStatus.OK);
+    }
+    
+    @GetMapping("/{idCatalogo}/servicio/{id}")
+    public ResponseEntity<ServicioResponse> obtenerServicioPorId(
+            @PathVariable("idCatalogo") Integer idCatalogo,
+            @PathVariable("id") Integer id) {
+        ServicioResponse servicioResponse = itemService.obtenerServicioPorId(id);
+        return new ResponseEntity<>(servicioResponse, HttpStatus.OK);
+    }
+    
+    @PostMapping("/{catalogoId}/servicio")
+    public ResponseEntity<Long> agregarServicioAlCatalogo(
+            @PathVariable("catalogoId") Integer catalogoId,
+            @RequestBody ServicioRequest servicioRequest) {
+        long servicioId = itemService.agregarServicio(servicioRequest, catalogoId);
+        return new ResponseEntity<>(servicioId, HttpStatus.CREATED);
+    }
+    
+    @DeleteMapping("/{idCatalogo}/servicio/{id}/eliminar")
+    public ResponseEntity<String> eliminarServicioPorId(
+            @PathVariable("idCatalogo") Integer idCatalogo,
+            @PathVariable("id") Integer id) {
+        itemService.eliminarServicioPorId(id);
+        return new ResponseEntity<>("Servicio eliminado exitosamente", HttpStatus.OK);
+    }
+    
     @PostMapping("/servicio/{id}/calificar")
-    public ResponseEntity<String> calificarServicio(@PathVariable("id") Integer id, @RequestBody BigDecimal calificacion) {
+    public ResponseEntity<String> calificarServicio(
+            @PathVariable("id") Integer id, 
+            @RequestBody BigDecimal calificacion) {
         itemService.calificarServicio(id, calificacion);
         return new ResponseEntity<>("Servicio calificado exitosamente", HttpStatus.OK);
-    }   
+    }
 }

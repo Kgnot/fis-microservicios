@@ -1,7 +1,10 @@
 package uni.fis.catalogo.Entity.Items;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.util.Date;
+
+import org.postgresql.util.PGInterval;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,36 +19,44 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Duration;
-import java.time.LocalTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Builder
+@Entity
 @Table(name = "item")
-@SecondaryTable(name = "servicio",
-                pkJoinColumns=@PrimaryKeyJoinColumn(name = "id"))
-public class Servicio{
+@SecondaryTable(
+    name = "servicio",
+    pkJoinColumns = @PrimaryKeyJoinColumn(name = "id")
+)
+public class Servicio {
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
     @Column(name = "id")
     private Integer id;
-    @Column(name = "id_catalogo",nullable = false)
+    
+    @Column(name = "id_catalogo", nullable = false)
     private Integer idCatalogo;
+    
     @Column(name = "nombre", nullable = false)
     private String nombre;
-    @Column(name = "precio",nullable = false)
+    
+    @Column(name = "precio", nullable = false)
     private BigDecimal precio;
-    @Column(name = "fecha",nullable = false)
+    
+    @Column(name = "fecha", nullable = false)
     private Date fechaCreacion;
+    
     @Column(name = "valoracion")
-    private BigDecimal valoración;
+    private BigDecimal valoracion;
+    
     @Column(name = "estado", nullable = false)
     private boolean disponible;
+    
     @Column(name = "duracion", table = "servicio", nullable = false, columnDefinition = "INTERVAL")
-    private Duration duracion;
+    private PGInterval duracion;
+    
     @Column(name = "horario", table = "servicio", nullable = false)
     private LocalTime horario;
 }
