@@ -88,6 +88,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
           
       - name: Build and start microservice
         run: |
@@ -99,20 +100,30 @@ jobs:
           
           # Build with Maven or Gradle
           if [ -f "pom.xml" ]; then
-            ./mvnw clean package -DskipTests
-            JAR_FILE=$(find target -name "*.jar" | head -n 1)
+            echo "Using Maven..."
+            mvn clean package -DskipTests
+            JAR_FILE=$(find target -name "*.jar" | grep -v "original" | head -n 1)
           elif [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; then
-            ./gradlew clean build -x test
-            JAR_FILE=$(find build/libs -name "*.jar" | head -n 1)
+            echo "Using Gradle..."
+            gradle clean build -x test
+            JAR_FILE=$(find build/libs -name "*.jar" | grep -v "plain" | head -n 1)
           else
             echo "❌ ERROR: No pom.xml or build.gradle found"
             exit 1
           fi
           
+          if [ -z "$JAR_FILE" ]; then
+            echo "❌ ERROR: No JAR file was generated"
+            exit 1
+          fi
+          
+          echo "📦 JAR file: $JAR_FILE"
+          
           echo "🚀 Starting $SRV on port $PORT..."
           SERVER_PORT=$PORT java -jar $JAR_FILE &
           APP_PID=$!
           echo "APP_PID=$APP_PID" >> $GITHUB_ENV
+          echo "Process PID: $APP_PID"
           
           # Wait for app to start
           echo "⏳ Waiting for service to be ready..."
