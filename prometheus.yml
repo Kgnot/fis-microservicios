@@ -1,7 +1,68 @@
 global:
   scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'fis-microservices'
+
+# Configuración de alertas (opcional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
 
 scrape_configs:
+  # Métricas de Nginx (ya lo tenías)
   - job_name: 'nginx-exporter'
     static_configs:
       - targets: ['nginx-exporter:9113']
+        labels:
+          service: 'nginx'
+          layer: 'gateway'
+
+  # ===================================
+  # NUEVO: Métricas de Spring Boot
+  # ===================================
+  
+  - job_name: 'auth-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['auth:8080']
+        labels:
+          service: 'auth'
+          layer: 'backend'
+          team: 'security'
+
+  - job_name: 'usuario-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['usuario:8093']
+        labels:
+          service: 'usuario'
+          layer: 'backend'
+          team: 'core'
+
+  - job_name: 'email-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['email:8083']
+        labels:
+          service: 'email'
+          layer: 'backend'
+          team: 'notifications'
+
+  - job_name: 'vehiculo-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['vehiculo:8094']
+        labels:
+          service: 'vehiculo'
+          layer: 'backend'
+          team: 'core'
+
+  # Métricas del propio Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+          layer: 'monitoring'
