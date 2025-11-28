@@ -85,3 +85,6 @@ HELP.md
 # Checkstyle reports
 **/checkstyle-output.xml
 **/checkstyle-result.xml
+
+#env: 
+.env
