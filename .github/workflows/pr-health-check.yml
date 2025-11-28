@@ -28,23 +28,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # --------------------------
+      # CHECKOUT
+      # --------------------------
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # <-- necesario para usar git diff con ramas remotas
+          fetch-depth: 0
 
+      # --------------------------
+      # FETCH BASE BRANCH
+      # --------------------------
+      - name: Fetch base branch
+        run: |
+          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+
+      # --------------------------
+      # DETECT UPDATED SERVICE
+      # --------------------------
       - name: Determine updated microservice
         id: detect
         run: |
           echo "Detecting changed microservice folder..."
-
           BASE_REF="${{ github.base_ref }}"
           echo "Base branch: $BASE_REF"
 
-          # fetch explícito para evitar "unknown revision"
-          git fetch origin "$BASE_REF"
-
-          SRV=$(git diff --name-only "origin/$BASE_REF" \
+          SRV=$(git diff --name-only origin/$BASE_REF...HEAD \
             | cut -d'/' -f1 \
             | sort -u \
             | grep -vE '^\.|^README|^docker-compose')
@@ -52,6 +61,9 @@ jobs:
           echo "service=$SRV" >> $GITHUB_OUTPUT
           echo "Detected service: $SRV"
 
+      # --------------------------
+      # VALIDATE ONLY ONE SERVICE CHANGED
+      # --------------------------
       - name: Fail if multiple services changed
         run: |
           COUNT=$(echo "${{ steps.detect.outputs.service }}" | wc -w)
@@ -60,12 +72,15 @@ jobs:
             exit 1
           fi
 
-      - name: Validate microservice port + actuator + compose healthcheck
+      # --------------------------
+      # EXTRACT SERVER PORT
+      # --------------------------
+      - name: Extract server port
+        id: port
         run: |
           SRV="${{ steps.detect.outputs.service }}"
-          echo "Validating microservice: $SRV"
+          echo "Extracting port from microservice: $SRV"
 
-          # Detectar archivo de configuración
           PROP_FILE=""
           if [ -f "$SRV/src/main/resources/application.properties" ]; then
             PROP_FILE="$SRV/src/main/resources/application.properties"
@@ -76,44 +91,127 @@ jobs:
             exit 1
           fi
 
-          # Extract server.port
-          PORT=$(grep -E "^server.port=" "$PROP_FILE" | cut -d'=' -f2)
+          PORT=$(grep -E "^server.port=" "$PROP_FILE" | cut -d'=' -f2 | tr -d '[:space:]')
           if [ -z "$PORT" ]; then
             echo "❌ ERROR: server.port not defined in $PROP_FILE"
             exit 1
           fi
 
+          echo "port=$PORT" >> $GITHUB_OUTPUT
           echo "✔ server.port detected: $PORT"
 
-          # Check actuator enabled
-          if grep -qi "management.endpoints.web.exposure.include" "$PROP_FILE"; then
-            echo "✔ Actuator exposure found"
+      # --------------------------
+      # SETUP JDK
+      # --------------------------
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # --------------------------
+      # BUILD + START MICROSERVICE USING SECRETS
+      # --------------------------
+      - name: Build and start microservice
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          HTTP_BASIC_USER: ${{ secrets.HTTP_BASIC_USER }}
+          HTTP_BASIC_PASSWORD: ${{ secrets.HTTP_BASIC_PASSWORD }}
+        run: |
+          SRV="${{ steps.detect.outputs.service }}"
+          PORT="${{ steps.port.outputs.port }}"
+
+          echo "🔨 Building $SRV..."
+          cd $SRV
+
+          # Maven or Gradle
+          if [ -f "pom.xml" ]; then
+            mvn clean package -DskipTests
+            JAR_FILE=$(find target -name "*.jar" | grep -v "original" | head -n 1)
+          elif [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; then
+            gradle clean build -x test
+            JAR_FILE=$(find build/libs -name "*.jar" | grep -v "plain" | head -n 1)
           else
-            echo "❌ ERROR: Actuator exposure NOT configured in $PROP_FILE"
+            echo "❌ ERROR: No pom.xml or build.gradle found"
             exit 1
           fi
 
-          # Validate docker-compose service exists
-          if ! grep -q "${SRV}:" docker-compose.yml; then
-            echo "❌ ERROR: $SRV not defined in docker-compose.yml"
+          if [ -z "$JAR_FILE" ]; then
+            echo "❌ ERROR: No JAR file generated"
             exit 1
           fi
 
-          # Validate SERVER_PORT matches
-          if ! grep -q "SERVER_PORT: $PORT" docker-compose.yml; then
-            echo "❌ ERROR: SERVER_PORT mismatch in docker-compose.yml. Expected: $PORT"
+          echo "📦 JAR file: $JAR_FILE"
+
+          echo "🚀 Starting $SRV on port $PORT..."
+
+          SERVER_PORT=$PORT \
+          DATABASE_URL="$DATABASE_URL" \
+          DATABASE_USERNAME="$DATABASE_USERNAME" \
+          DATABASE_PASSWORD="$DATABASE_PASSWORD" \
+          SECRET_KEY="$SECRET_KEY" \
+          HTTP_BASIC_USER="$HTTP_BASIC_USER" \
+          HTTP_BASIC_PASSWORD="$HTTP_BASIC_PASSWORD" \
+          java -jar $JAR_FILE &
+
+          APP_PID=$!
+          echo "APP_PID=$APP_PID" >> $GITHUB_ENV
+
+          echo "⏳ Waiting for service to be ready..."
+
+          for i in {1..30}; do
+            if curl -sf http://localhost:$PORT/actuator/health > /dev/null 2>&1; then
+              echo "✅ Service is UP!"
+              exit 0
+            fi
+            echo "Attempt $i/30: waiting..."
+            sleep 2
+          done
+
+          echo "❌ ERROR: Service failed to start"
+          kill $APP_PID || true
+          exit 1
+
+      # --------------------------
+      # TEST ACTUATOR
+      # --------------------------
+      - name: Test actuator health endpoint
+        run: |
+          PORT="${{ steps.port.outputs.port }}"
+          echo "🩺 Testing actuator: http://localhost:$PORT/actuator/health"
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" http://localhost:$PORT/actuator/health)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response Body: $BODY"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ ERROR: Expected HTTP 200"
             exit 1
           fi
 
-          echo "✔ SERVER_PORT matches docker-compose.yml"
-
-          # Validate healthcheck block reference
-          if ! grep -A5 "${SRV}:" docker-compose.yml | grep -q "healthcheck"; then
-            echo "❌ ERROR: $SRV does NOT inherit or declare healthcheck using x-healthcheck"
+          if echo "$BODY" | grep -q '"status":"UP"'; then
+            echo "✅ Health is UP"
+          else
+            echo "❌ ERROR: Health endpoint not UP"
             exit 1
           fi
 
-          echo "✔ Healthcheck found in docker-compose for $SRV"
+      # --------------------------
+      # CLEANUP
+      # --------------------------
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ ! -z "$APP_PID" ]; then
+            kill $APP_PID || true
+          fi
 
       - name: Final result
         run: echo "🎉 Validation completed successfully!"
