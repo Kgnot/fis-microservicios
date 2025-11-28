@@ -9,7 +9,7 @@ import fis.auth.application.service.TokenService;
 import fis.auth.domain.model.Login;
 import fis.auth.domain.model.Token;
 import fis.auth.domain.model.TokenRequest;
-import fis.auth.domain.service.EncryptStrategy;
+import fis.auth.infrastructure.error.NoUserFoundError;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,27 +17,26 @@ public class LoginServiceImpl implements LoginService {
 
     private final TokenService tokenService;
     private final UserMSRepository repository;
-    private final EncryptStrategy encrypt;
 
     public LoginServiceImpl(
             TokenService tokenService,
-            UserMSRepository repository,
-            EncryptStrategy encrypt
+            UserMSRepository repository
     ) {
         this.tokenService = tokenService;
         this.repository = repository;
-        this.encrypt = encrypt;
     }
 
-    @Override
-    public Token execute(Login login) {
-        //Primer paso es encriptar, luego buscar para comparar
-        String passwordEncrypted = encrypt.encrypt(login.password());
-        //Obtenemos el TokenRequest, es decir, el nombre y rol desde el microservicio de usuario
-        TokenRequest req = repository.findNameAndRolUser(login.name(), passwordEncrypted);
-        // Luego generamos el token.
-        TokenCommand tokenCommand = new GenerateTokenCommand(this.tokenService, req);
+    // cambio para subir la rama
+        @Override
+        public Token execute(Login login) throws NoUserFoundError {
+            //Obtenemos el TokenRequest, es decir, el nombre y rol desde el microservicio de usuario
+            TokenRequest req = repository.findNameAndRolUser(login.email(), login.password());
+            if (req == null) {
+                throw NoUserFoundError.of("Usuario no encontrado con las credenciales proporcionadas");
+            }
+            // Luego generamos el token.
+            TokenCommand tokenCommand = new GenerateTokenCommand(this.tokenService, req);
 
-        return tokenCommand.execute();
+            return tokenCommand.execute();
+        }
     }
-}
