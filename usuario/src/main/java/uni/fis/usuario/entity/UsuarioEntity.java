@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity {
+public class UsuarioEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,14 +22,16 @@ public class UserEntity {
     private String apellido_1;
     private String apellido_2;
     private LocalDateTime fechaDeNacimiento;
-    @Column(name = "idDocumento")
-    private String documento;
-    private Integer imgPerfil;
+
+    @OneToOne
+    @JoinColumn(name = "id_documento")
+    private DocumentoEntity idDocumento; // foranea
+
     private String email;
     private Integer strikes;
-    private Integer idRol;
-    @Column(name = "id_multimedia")
-    private Integer idMultimedia;
+    private Integer idRol; // foranea
+    @Column(name = "img_perfil") //foranea
+    private Integer imgPerfil;
 
 
 }
