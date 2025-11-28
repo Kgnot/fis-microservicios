@@ -22,7 +22,7 @@ public class UserEntity {
     private String apellido_1;
     private String apellido_2;
     private LocalDateTime fechaDeNacimiento;
-    @Column(name = "documento", length = 100)
+    @Column(name = "idDocumento")
     private String documento;
     private Integer imgPerfil;
     private String email;
