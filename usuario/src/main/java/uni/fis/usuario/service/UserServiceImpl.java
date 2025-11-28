@@ -27,8 +27,8 @@ public class UserServiceImpl implements UserService {
     private final EntityManager entityManager;
 
     public UserServiceImpl(UserRepository userRepository,
-                           PasswordRepository passwordRepository,
-                           EntityManager entityManager) {
+            PasswordRepository passwordRepository,
+            EntityManager entityManager) {
         this.userRepository = userRepository;
         this.passwordRepository = passwordRepository;
         this.entityManager = entityManager;
@@ -67,8 +67,7 @@ public class UserServiceImpl implements UserService {
                     null,
                     LocalDateTime.now(),
                     user.password(), // Aquí deberías encriptar la contraseña
-                    userCreated.getId()
-            );
+                    userCreated.getId());
             passwordRepository.save(entityPassword);
             return UserMapper.entityToDto(entity);
 
@@ -89,8 +88,7 @@ public class UserServiceImpl implements UserService {
                     null,
                     LocalDateTime.now(),
                     user.password(),
-                    userCreated.getId()
-            );
+                    userCreated.getId());
             passwordRepository.save(entityPassword);
             return UserMapper.entityToDto(entity);
         }
@@ -135,8 +133,7 @@ public class UserServiceImpl implements UserService {
     private void resetSequence() {
         try {
             Query query = entityManager.createNativeQuery(
-                    "SELECT setval('usuario_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM usuario))"
-            );
+                    "SELECT setval('usuario_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM usuario))");
             query.getSingleResult();
         } catch (Exception e) {
             throw new RuntimeException("Error al resetear secuencia: " + e.getMessage());
