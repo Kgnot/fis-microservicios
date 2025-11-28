@@ -3,7 +3,7 @@ name: Validate Microservice PR
 on:
   pull_request:
     branches:
-      - main
+      - master
       - desarrollo
     paths:
       - 'auth/**'
