@@ -4,8 +4,42 @@ networks:
   fis-network:
     driver: bridge
 
+# -------------------------------------
+# Defaults para TODOS los microservicios
+# -------------------------------------
+x-service-defaults: &service-defaults
+  networks:
+    - fis-network
+  env_file:
+    - .env
+  restart: always
+
+# -------------------------------------
+# Healthcheck base que usa SERVER_PORT
+# -------------------------------------
+x-healthcheck: &healthcheck
+  test: [ "CMD", "wget", "-qO-", "http://localhost:${SERVER_PORT}/actuator/health" ]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 30s
+
+# -------------------------------------
+# Macro GLOBAL para microservicios Spring Boot
+# -------------------------------------
+x-microservice: &microservice
+  <<: *service-defaults
+  healthcheck:
+    <<: *healthcheck
+
 services:
+
+  # ---------------------
+  # MICROSERVICIOS
+  # ---------------------
+
   auth:
+    <<: *microservice
     build: ./auth
     container_name: fis-auth
     ports:
@@ -26,6 +60,7 @@ services:
       - fis-network
 
   usuario:
+    <<: *microservice
     build: ./usuario
     container_name: fis-usuario
     ports:
@@ -66,6 +101,7 @@ services:
       - fis-network
 
   vehiculo:
+    <<: *microservice
     build: ./vehiculo
     container_name: fis-vehiculo
     ports:
@@ -85,6 +121,9 @@ services:
     networks:
       - fis-network
 
+  # ---------------------
+  #     NGINX
+  # ---------------------
   nginx:
     image: nginx:alpine
     container_name: fis-nginx

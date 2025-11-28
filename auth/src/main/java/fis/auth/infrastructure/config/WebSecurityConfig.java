@@ -24,19 +24,18 @@ public class WebSecurityConfig {
         @Order(1)
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
-                        .securityMatcher("/api/**") // ← Solo endpoints /api/**
-                        .csrf(AbstractHttpConfigurer::disable)
-                        .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers(
-                                        "/api/v1/auth/login",
-                                        "/api/v1/auth/refresh",
-                                        "/api/v1/auth/sign-in"
-                                ).permitAll()
-                                .anyRequest().authenticated()
-                        )
-                        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                        .sessionManagement(session -> session
-                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                                .securityMatcher("/api/**") // ← Solo endpoints /api/**
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .authorizeHttpRequests(authorize -> authorize
+                                                .requestMatchers(
+                                                                "/api/v1/auth/login",
+                                                                "/api/v1/auth/refresh",
+                                                                "/api/v1/auth/sign-in")
+                                                .permitAll()
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
                 return http.build();
         }
@@ -46,13 +45,14 @@ public class WebSecurityConfig {
         @Order(2)
         public SecurityFilterChain publicEndpointsFilterChain(HttpSecurity http) throws Exception {
                 return http
-                        .securityMatcher("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html") // ← Solo estos
-                        .authorizeHttpRequests(auth -> auth
-                                .anyRequest().permitAll() // Todos públicos
-                        )
-                        .csrf(AbstractHttpConfigurer::disable)
-                        .sessionManagement(session -> session
-                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                        .build();
+                                .securityMatcher("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**",
+                                                "/swagger-ui.html") // ← Solo estos
+                                .authorizeHttpRequests(auth -> auth
+                                                .anyRequest().permitAll() // Todos públicos
+                                )
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .build();
         }
 }
