@@ -30,12 +30,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # <-- necesario para usar git diff con ramas remotas
 
       - name: Determine updated microservice
         id: detect
         run: |
           echo "Detecting changed microservice folder..."
-          SRV=$(git diff --name-only origin/main | cut -d'/' -f1 | sort -u | grep -vE '^\.|^README|^docker-compose')
+
+          BASE_REF="${{ github.base_ref }}"
+          echo "Base branch: $BASE_REF"
+
+          # fetch explícito para evitar "unknown revision"
+          git fetch origin "$BASE_REF"
+
+          SRV=$(git diff --name-only "origin/$BASE_REF" \
+            | cut -d'/' -f1 \
+            | sort -u \
+            | grep -vE '^\.|^README|^docker-compose')
+
           echo "service=$SRV" >> $GITHUB_OUTPUT
           echo "Detected service: $SRV"
 
@@ -52,6 +65,7 @@ jobs:
           SRV="${{ steps.detect.outputs.service }}"
           echo "Validating microservice: $SRV"
 
+          # Detectar archivo de configuración
           PROP_FILE=""
           if [ -f "$SRV/src/main/resources/application.properties" ]; then
             PROP_FILE="$SRV/src/main/resources/application.properties"
