@@ -3,13 +3,13 @@ package uni.fis.usuario.mapper;
 import uni.fis.usuario.dto.UserDto;
 import uni.fis.usuario.dto.request.UserRequest;
 import uni.fis.usuario.dto.response.UserResponse;
-import uni.fis.usuario.entity.UserEntity;
+import uni.fis.usuario.entity.UsuarioEntity;
 
 import java.time.LocalDateTime;
 
 public class UserMapper {
 
-    public static UserDto entityToDto(UserEntity entity) {
+    public static UserDto entityToDto(UsuarioEntity entity) {
         return new UserDto(
                 entity.getId(),
                 entity.getNombre(),
@@ -19,23 +19,22 @@ public class UserMapper {
         );
     }
 
-    public static UserEntity dtoToEntity(UserDto userDto) {
-        return new UserEntity(
+    public static UsuarioEntity dtoToEntity(UserDto userDto) {
+        return new UsuarioEntity(
                 userDto.id(),
                 userDto.nombre(),
                 userDto.apellido_1(),
                 userDto.apellido_2(),
-                null, // fechaDeNacimiento
-                null, // documento
-                null, // imgPerfil
+                null,//fecha de nacimiento
+                null, // idDocumento
                 null, // email
                 null, // strikes
-                userDto.idRol(),
-                null  // idMultimedia
+                userDto.idRol(), // idRol
+                null // imgPerfil
         );
     }
 
-    public static UserResponse dtoToResponse(UserDto userDto){
+    public static UserResponse dtoToResponse(UserDto userDto) {
         return new UserResponse(
                 userDto.id(),
                 userDto.nombre(),
@@ -43,19 +42,19 @@ public class UserMapper {
         );
     }
 
-    public static UserEntity requestToEntity(UserRequest userRequest){
-        return new UserEntity(
-                null, // email - se genera automáticamente
+    public static UsuarioEntity requestToEntity(UserRequest userRequest) {
+
+        return new UsuarioEntity(
+                null, // id - se genera automáticamente
                 userRequest.name(),
                 userRequest.apellido1(),
                 userRequest.apellido2(),
                 parseFechaNacimiento(userRequest.fechaNacimiento()),
-                userRequest.documento(),
-                userRequest.imgPerfil(),
+                DocumentoMapper.toEntity(userRequest.documento()),
                 userRequest.email(),
                 userRequest.strikes() != null ? userRequest.strikes() : 0, // default 0
                 userRequest.idRol(),
-                userRequest.idMultimedia()
+                userRequest.imgPerfil()
         );
     }
 

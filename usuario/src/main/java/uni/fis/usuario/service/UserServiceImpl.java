@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import uni.fis.usuario.dto.UserDto;
 import uni.fis.usuario.dto.request.UserRequest;
 import uni.fis.usuario.entity.PasswordEntity;
-import uni.fis.usuario.entity.UserEntity;
+import uni.fis.usuario.entity.UsuarioEntity;
 import uni.fis.usuario.error.InvalidUserDataException;
 import uni.fis.usuario.error.UserAlreadyExistsException;
 import uni.fis.usuario.error.UserNotFoundException;
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDto> findById(int id) {
-        UserEntity entity = userRepository.findById(id)
+        UsuarioEntity entity = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.byId(id));
         return Optional.of(UserMapper.entityToDto(entity));
     }
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
-            UserEntity entity = UserMapper.requestToEntity(user);
+            UsuarioEntity entity = UserMapper.requestToEntity(user);
             var userCreated = userRepository.save(entity);
 
             PasswordEntity entityPassword = new PasswordEntity(
@@ -75,14 +75,14 @@ public class UserServiceImpl implements UserService {
         } catch (DataIntegrityViolationException e) {
             // Manejar violación de integridad (documento único, etc.)
             if (e.getMessage().contains("documento")) {
-                throw UserAlreadyExistsException.byDocument(user.documento());
+                throw UserAlreadyExistsException.byDocument(user.documento().numeroDocumento());
             }
 
             // Resetear secuencia si hay conflicto de ID
             resetSequence();
 
             // Reintentar
-            UserEntity entity = UserMapper.requestToEntity(user);
+            UsuarioEntity entity = UserMapper.requestToEntity(user);
             var userCreated = userRepository.save(entity);
 
             PasswordEntity entityPassword = new PasswordEntity(
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
         if (request.fechaNacimiento() == null || request.fechaNacimiento().trim().isEmpty()) {
             throw InvalidUserDataException.missingField("fechaNacimiento");
         }
-        if (request.documento() == null || request.documento().trim().isEmpty()) {
+        if (request.documento() == null || request.documento().numeroDocumento().trim().isEmpty()) {
             throw InvalidUserDataException.missingField("documento");
         }
         if (request.email() == null || request.email().trim().isEmpty()) {
