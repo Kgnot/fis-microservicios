@@ -17,12 +17,11 @@ public class AuthMapper {
                 signInRequest.apellido1(),
                 signInRequest.apellido2(),
                 signInRequest.fechaNacimiento(),
-                signInRequest.documento(),
+                DocumentoMapper.toDomain(signInRequest.documento()),
                 signInRequest.imgPerfil(), // Si puede ser null
                 signInRequest.email(),
                 signInRequest.strikes() != null ? signInRequest.strikes() : 0, // Default 0
                 signInRequest.idRol(),
-                signInRequest.idMultimedia(), // Si puede ser null
                 signInRequest.password(),
                 signInRequest.emailTutor()
         );
