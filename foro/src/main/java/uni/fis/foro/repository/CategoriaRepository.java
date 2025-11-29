@@ -8,7 +8,7 @@ import uni.fis.foro.entity.CategoriaEntity;
 
 
 @Repository
-public interface CategoriaRepository extends JpaRepository<CategoriaEntity, Long> {
+public interface CategoriaRepository extends JpaRepository<CategoriaEntity, Integer> {
     Optional<CategoriaEntity> findByNombre(String nombre);
     List<CategoriaEntity> findAll();
 }

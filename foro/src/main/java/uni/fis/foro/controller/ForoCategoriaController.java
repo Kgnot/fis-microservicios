@@ -30,7 +30,7 @@ public class ForoCategoriaController {
     }
 
     @GetMapping("/categoria/{idCategoria}")
-    public ResponseEntity<List<ForoCategoriaEntity>> listarPorCategoria(@PathVariable Long idCategoria) {
+    public ResponseEntity<List<ForoCategoriaEntity>> listarPorCategoria(@PathVariable Integer idCategoria) {
         return ResponseEntity.ok(foroCategoriaService.listarPorCategoria(idCategoria));
     }
 }

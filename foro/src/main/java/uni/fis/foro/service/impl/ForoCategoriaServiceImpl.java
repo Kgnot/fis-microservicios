@@ -33,8 +33,8 @@ class ForoCategoriaServiceImpl implements ForoCategoriaService {
     @Override
     public ForoCategoriaEntity asignarCategoria(AsignarCategoriaForoDTO dto) {
 
-        ForoEntity foro = foroRepository.findById(dto.getIdForo()).orElseThrow();
-        CategoriaEntity categoria = categoriaRepository.findById(dto.getIdCategoria()).orElseThrow();
+        ForoEntity foro = foroRepository.findById(dto.getIdForo().intValue()).orElseThrow();
+        CategoriaEntity categoria = categoriaRepository.findById(dto.getIdCategoria().intValue()).orElseThrow();
 
         ForoCategoriaEntity fc = new ForoCategoriaEntity();
         fc.setForo(foro);
@@ -44,7 +44,7 @@ class ForoCategoriaServiceImpl implements ForoCategoriaService {
     }
 
     @Override
-    public List<ForoCategoriaEntity> listarPorCategoria(Long idCategoria) {
+    public List<ForoCategoriaEntity> listarPorCategoria(Integer idCategoria) {
         CategoriaEntity categoria = categoriaRepository.findById(idCategoria).orElseThrow();
         return foroCategoriaRepository.findByCategoria(categoria);
     }

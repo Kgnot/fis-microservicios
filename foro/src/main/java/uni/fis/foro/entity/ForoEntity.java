@@ -14,7 +14,7 @@ import lombok.Data;
 public class ForoEntity {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     private String nombre;
 
 }

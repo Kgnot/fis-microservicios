@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ForoCategoriaService {
     ForoCategoriaEntity asignarCategoria(AsignarCategoriaForoDTO dto);
-    List<ForoCategoriaEntity> listarPorCategoria(Long idCategoria);
+    List<ForoCategoriaEntity> listarPorCategoria(Integer idCategoria);
 }
 
 
