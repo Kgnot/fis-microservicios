@@ -48,4 +48,12 @@ public class ApiResponse<T> {
                 .code(code)
                 .build();
     }
+
+    public static <T> ApiResponse<T> info(String message, Integer code){
+        return ApiResponse.<T>builder()
+                .status("informacion")
+                .message(message)
+                .code(code)
+                .build();
+    }
 }

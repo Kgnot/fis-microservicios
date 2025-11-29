@@ -4,127 +4,148 @@ networks:
   fis-network:
     driver: bridge
 
+# -------------------------------------
+# Defaults para TODOS los microservicios
+# -------------------------------------
+x-service-defaults: &service-defaults
+  networks:
+    - fis-network
+  env_file:
+    - .env
+  restart: always
+
+# -------------------------------------
+# Healthcheck base que usa SERVER_PORT
+# -------------------------------------
+x-healthcheck: &healthcheck
+  test: [ "CMD", "wget", "-qO-", "http://localhost:${SERVER_PORT}/actuator/health" ]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 30s
+
+# -------------------------------------
+# Macro GLOBAL para microservicios Spring Boot
+# -------------------------------------
+x-microservice: &microservice
+  <<: *service-defaults
+  healthcheck:
+    <<: *healthcheck
+
 services:
+
+  # ---------------------
+  # MICROSERVICIOS
+  # ---------------------
+
   auth:
+    <<: *microservice
     build: ./auth
     container_name: fis-auth
-    ports:
-      - "8080:8080"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8080
 
   catalogo:
+    <<: *microservice
     build: ./catalogo
     container_name: fis-catalogo
-    ports:
-      - "8081:8081"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8081
 
   contenido:
+    <<: *microservice
     build: ./contenido
     container_name: fis-contenido
-    ports:
-      - "8082:8082"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8082
 
   email:
+    <<: *microservice
     build: ./email
     container_name: fis-email
-    ports:
-      - "8083:8083"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8083
 
   filtrocontenido:
+    <<: *microservice
     build: ./filtrocontenido
     container_name: fis-filtrocontenido
-    ports:
-      - "8084:8084"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8084
 
   foro:
+    <<: *microservice
     build: ./foro
     container_name: fis-foro
-    ports:
-      - "8085:8085"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8085
 
   geo:
+    <<: *microservice
     build: ./geo
     container_name: fis-geo
-    ports:
-      - "8086:8086"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8086
 
   mensajeria:
+    <<: *microservice
     build: ./mensajeria
     container_name: fis-mensajeria
-    ports:
-      - "8087:8087"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8087
 
   moderacion:
+    <<: *microservice
     build: ./moderacion
     container_name: fis-moderacion
-    ports:
-      - "8088:8088"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8088
 
   multimedia:
+    <<: *microservice
     build: ./multimedia
     container_name: fis-multimedia
-    ports:
-      - "8089:8089"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8089
 
   noticia:
+    <<: *microservice
     build: ./noticia
     container_name: fis-noticia
-    ports:
-      - "8090:8090"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8090
 
   pago:
+    <<: *microservice
     build: ./pago
     container_name: fis-pago
-    ports:
-      - "8091:8091"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8091
 
   proveedor:
+    <<: *microservice
     build: ./proveedor
     container_name: fis-proveedor
-    ports:
-      - "8092:8092"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8092
 
   usuario:
+    <<: *microservice
     build: ./usuario
     container_name: fis-usuario
-    ports:
-      - "8093:8093"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8093
 
   vehiculo:
+    <<: *microservice
     build: ./vehiculo
     container_name: fis-vehiculo
-    ports:
-      - "8094:8094"
-    networks:
-      - fis-network
+    environment:
+      SERVER_PORT: 8094
 
+  # ---------------------
+  #     NGINX
+  # ---------------------
   nginx:
     image: nginx:alpine
     container_name: fis-nginx
@@ -132,21 +153,6 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - auth
-      - catalogo
-      - contenido
-      - email
-      - filtrocontenido
-      - foro
-      - geo
-      - mensajeria
-      - moderacion
-      - multimedia
-      - noticia
-      - pago
-      - proveedor
-      - usuario
-      - vehiculo
+    restart: always
     networks:
       - fis-network
