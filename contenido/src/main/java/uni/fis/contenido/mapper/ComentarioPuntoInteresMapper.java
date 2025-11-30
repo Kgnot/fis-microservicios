@@ -2,8 +2,8 @@ package uni.fis.contenido.mapper;
 
 import org.springframework.stereotype.Component;
 import uni.fis.contenido.dto.ComentarioPuntoInteresDTO;
+import uni.fis.contenido.entity.ComentarioEntity;
 import uni.fis.contenido.entity.ComentarioPuntoInteresEntity;
-import uni.fis.contenido.entity.ContenidoEntity;
 
 @Component
 public class ComentarioPuntoInteresMapper {
@@ -12,7 +12,7 @@ public class ComentarioPuntoInteresMapper {
         ComentarioPuntoInteresDTO dto = new ComentarioPuntoInteresDTO();
         dto.setId(entity.getId());
         dto.setIdPunto(entity.getIdPunto());
-        dto.setIdContenido(entity.getContenido() != null ? entity.getContenido().getId() : null);
+        dto.setIdComentario(entity.getComentario() != null ? entity.getComentario().getId() : null);
         return dto;
     }
 
@@ -21,10 +21,10 @@ public class ComentarioPuntoInteresMapper {
         entity.setId(dto.getId());
         entity.setIdPunto(dto.getIdPunto());
 
-        if (dto.getIdContenido() != null) {
-            ContenidoEntity contenido = new ContenidoEntity();
-            contenido.setId(dto.getIdContenido());
-            entity.setContenido(contenido);
+        if (dto.getIdComentario() != null) {
+            ComentarioEntity comentario = new ComentarioEntity();
+            comentario.setId(dto.getIdComentario());
+            entity.setComentario(comentario);
         }
 
         return entity;

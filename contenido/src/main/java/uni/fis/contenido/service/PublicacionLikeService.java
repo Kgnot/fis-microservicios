@@ -4,6 +4,6 @@ import uni.fis.contenido.dto.LikeResponseDTO;
 
 public interface PublicacionLikeService {
 
-    public LikeResponseDTO sumarLike(Integer idPublicacion);
-    public LikeResponseDTO restarLike(Integer idPublicacion);
+    public LikeResponseDTO darLike(Integer idPublicacion, Integer idUsuario);
+    public LikeResponseDTO quitarLike(Integer idPublicacion, Integer idUsuario);
 }

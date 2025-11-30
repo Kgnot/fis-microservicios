@@ -6,6 +6,6 @@ import lombok.Data;
 public class ComentarioPuntoInteresDTO {
 
     private Integer id;        
-    private Integer idContenido;     
+    private Integer idComentario;     
     private Integer idPunto;      
 }

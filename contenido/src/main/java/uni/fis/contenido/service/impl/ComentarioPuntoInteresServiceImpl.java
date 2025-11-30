@@ -57,12 +57,11 @@ public class ComentarioPuntoInteresServiceImpl implements ComentarioPuntoInteres
     @Override
     public ComentarioPuntoInteresDTO create(ComentarioPuntoInteresDTO comentarioDTO) {
 
-        // 🔥 Validar datos básicos enviados por el front
         if (comentarioDTO.getIdPunto() == null) {
             throw new PuntoInteresNoValidoException("Debe enviar el idPunto desde el frontend");
         }
 
-        if (comentarioDTO.getIdContenido() == null) {
+        if (comentarioDTO.getIdComentario() == null) {
             throw new ContenidoNoValidoException("Debe enviar el idContenido para asociar el comentario");
         }
 

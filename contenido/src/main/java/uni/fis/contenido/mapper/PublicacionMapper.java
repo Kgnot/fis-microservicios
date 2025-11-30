@@ -13,7 +13,6 @@ public class PublicacionMapper {
         dto.setId(pub.getId());
         dto.setTitulo(pub.getTitulo());
         dto.setUsuario(pub.getContenido().getIdAutor());
-        dto.setLikes(pub.getLikes());
         dto.setTextoContenido(pub.getContenido().getTexto());
         dto.setFechaContenido(pub.getContenido().getFechaCreacion());
         dto.setIdForo(pub.getForo());

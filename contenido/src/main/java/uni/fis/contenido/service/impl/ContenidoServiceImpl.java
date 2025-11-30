@@ -39,6 +39,6 @@ class ContenidoServiceImpl implements ContenidoService {
 
     @Override
     public List<ContenidoEntity> listarPorUsuario(Integer usuario) {
-        return contenidoRepository.findByUsuario(usuario);
+        return contenidoRepository.findByIdAutor(usuario);
     }
 }

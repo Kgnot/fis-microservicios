@@ -2,6 +2,7 @@ package uni.fis.contenido.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import uni.fis.contenido.dto.LikeResponseDTO;
 import uni.fis.contenido.service.PublicacionLikeService;
 
@@ -15,13 +16,19 @@ public class PublicacionLikeController {
         this.likeService = likeService;
     }
 
-    @PostMapping("/{id}/sumar")
-    public ResponseEntity<LikeResponseDTO> sumarLike(@PathVariable Integer id) {
-        return ResponseEntity.ok(likeService.sumarLike(id));
+    @PostMapping("/dar")
+    public ResponseEntity<LikeResponseDTO> darLike(
+            @RequestParam Integer publicacion,
+            @RequestParam Integer usuario
+    ) {
+        return ResponseEntity.ok(likeService.darLike(publicacion, usuario));
     }
 
-    @PostMapping("/{id}/restar")
-    public ResponseEntity<LikeResponseDTO> restarLike(@PathVariable Integer id) {
-        return ResponseEntity.ok(likeService.restarLike(id));
+    @PostMapping("/quitar")
+    public ResponseEntity<LikeResponseDTO> quitarLike(
+            @RequestParam Integer publicacion,
+            @RequestParam Integer usuario
+    ) {
+        return ResponseEntity.ok(likeService.quitarLike(publicacion, usuario));
     }
 }

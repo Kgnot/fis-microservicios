@@ -1,5 +1,6 @@
 package uni.fis.contenido.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,8 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
-
 import lombok.Data;
 
 
@@ -26,13 +25,13 @@ public class PublicacionEntity {
     @JoinColumn(name = "contenido_id")
     private ContenidoEntity contenido;
 
-    @ManyToOne
-    @JoinColumn(name = "multimedia_id")
+    @Column(name = "multimedia_id")
     private Integer multimedia;
 
-    @ManyToOne
-    @JoinColumn(name = "foro_id")
+    @Column(name = "foro_id")
     private Integer foro;
 
+    @Column(name = "likes")
     private int likes;
+
 }

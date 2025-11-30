@@ -16,4 +16,7 @@ public class PublicacionLikeEntity {
     @ManyToOne
     @JoinColumn(name = "publicacion_id")
     private PublicacionEntity publicacion;
+
+    @Column(name = "likes")
+    private int likes; // Lombok generará getLikes() y setLikes()
 }

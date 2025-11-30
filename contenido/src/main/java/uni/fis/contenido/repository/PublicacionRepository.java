@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface PublicacionRepository extends JpaRepository<PublicacionEntity, Integer> {
     List<PublicacionEntity> findByForo(Integer foro);
-    List<PublicacionEntity> findByUsuario(Integer usuario);
+    List<PublicacionEntity> findByContenido_IdAutor(Integer idAutor);
 }
