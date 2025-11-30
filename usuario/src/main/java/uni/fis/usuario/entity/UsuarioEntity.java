@@ -1,5 +1,6 @@
 package uni.fis.usuario.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +30,10 @@ public class UsuarioEntity {
 
     private String email;
     private Integer strikes;
-    private Integer idRol; // foranea
+    @ManyToOne()
+    @JoinColumn(name = "id_rol")
+    @JsonBackReference
+    private RolEntity rol;
     private Integer imgPerfil;
 
 

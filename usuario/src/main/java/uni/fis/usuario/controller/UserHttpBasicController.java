@@ -27,7 +27,7 @@ public class UserHttpBasicController {
             UserDto userDto = userService.save(request);
             log.info("Usuario creado exitosamente: " + userDto.id());
             return ResponseEntity.ok(ApiResponse.success("Usuario creado exitosamente",
-                    new TokenResponse(userDto.id(), userDto.idRol())));
+                    new TokenResponse(userDto.id(), userDto.idRol(), userDto.rolName(), userDto.email())));
         } catch (Exception e) {
             return ResponseEntity.status(400).body( // ← 400 para errores de validación
                     ApiResponse.error("Error al crear usuario: " + e.getMessage(), 400));

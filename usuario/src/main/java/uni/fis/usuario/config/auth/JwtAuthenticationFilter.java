@@ -16,7 +16,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import io.jsonwebtoken.Claims;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
@@ -55,16 +56,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private List<SimpleGrantedAuthority> getAuthoritiesFromClaims(Claims claims) {
-        var roles = claims.get("roles", List.class); // asumiendo roles = ["ADMIN", "USER"]
+    private Collection<SimpleGrantedAuthority> getAuthoritiesFromClaims(Claims claims) {
+        String role = claims.get("rol", String.class);
 
-        if (roles == null) {
-            return List.of();
+        if (role == null) {
+            return Collections.emptyList();
         }
 
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.toString()))
-                .toList();
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
+
 
 }
