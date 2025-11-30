@@ -14,24 +14,6 @@ x-service-defaults: &service-defaults
     - .env
   restart: always
 
-# -------------------------------------
-# Healthcheck base usando SERVER_PORT interno
-# -------------------------------------
-x-healthcheck: &healthcheck
-  test: [ "CMD", "wget", "-qO-", "http://localhost:${SERVER_PORT}/actuator/health" ]
-  interval: 30s
-  timeout: 10s
-  retries: 3
-  start_period: 30s
-
-# -------------------------------------
-# Macro GLOBAL para microservicios Spring Boot
-# -------------------------------------
-x-microservice: &microservice
-  <<: *service-defaults
-  healthcheck:
-    <<: *healthcheck
-
 services:
 
   # ---------------------
@@ -39,7 +21,7 @@ services:
   # ---------------------
 
   auth:
-    <<: *microservice
+    <<: *service-defaults
     build: ./auth
     container_name: fis-auth
     environment:
@@ -48,9 +30,15 @@ services:
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       SECRET_KEY: ${SECRET_KEY}
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   usuario:
-    <<: *microservice
+    <<: *service-defaults
     build: ./usuario
     container_name: fis-usuario
     environment:
@@ -59,9 +47,15 @@ services:
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       SECRET_KEY: ${SECRET_KEY}
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8093/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   email:
-    <<: *microservice
+    <<: *service-defaults
     build: ./email
     container_name: fis-email
     environment:
@@ -70,9 +64,15 @@ services:
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       SECRET_KEY: ${SECRET_KEY}
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8083/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   vehiculo:
-    <<: *microservice
+    <<: *service-defaults
     build: ./vehiculo
     container_name: fis-vehiculo
     environment:
@@ -81,6 +81,12 @@ services:
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       SECRET_KEY: ${SECRET_KEY}
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8094/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   # ---------------------
   #     NGINX — EL ÚNICO expuesto
@@ -89,7 +95,7 @@ services:
     image: nginx:alpine
     container_name: fis-nginx
     ports:
-      - "80:80" # ÚNICO puerto expuesto
+      - "80:80" # único expuesto
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -123,7 +129,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090" # si quieres NO exponer, elimina esta línea
+      - "9090:9090"
     networks:
       - fis-network
 
@@ -131,7 +137,7 @@ services:
     image: grafana/loki:latest
     container_name: fis-loki
     ports:
-      - "3100:3100" # opcional, puedes quitarlo
+      - "3100:3100"
     volumes:
       - ./loki-config.yaml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
@@ -155,7 +161,7 @@ services:
     image: grafana/grafana:latest
     container_name: fis-grafana
     ports:
-      - "3000:3000" # opcional, puedes quitarlo también
+      - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
