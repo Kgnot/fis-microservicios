@@ -28,7 +28,7 @@ public class ValidateController {
         try {
             log.info("Validando usuario: " + userValidateRequest.email());
             passwordService.validate(userValidateRequest.email(), userValidateRequest.password());
-
+            log.info("Pase la validación");
             var user = userService.findByEmail(userValidateRequest.email())
                     .orElseThrow(() -> UserNotFoundException.byEmail(userValidateRequest.email()));
 
