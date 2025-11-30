@@ -10,11 +10,13 @@ import fis.auth.infrastructure.dto.request.LoginRequest;
 import fis.auth.infrastructure.dto.request.SignInRequest;
 import fis.auth.infrastructure.dto.response.api.ApiResponse;
 import fis.auth.infrastructure.mapper.AuthMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Slf4j
 public class AuthController {
 
     private final LoginService loginService;
@@ -39,6 +41,7 @@ public class AuthController {
 
     @PostMapping("sign-in")
     public ResponseEntity<ApiResponse<Token>> signIn(@RequestBody SignInRequest signIn) {
+        log.info("Auth: request enviada {}", signIn);
         SignIn signInDomain = AuthMapper.toDomain(signIn);
         Token token = signInService.execute(signInDomain); // Igual aquí
 
