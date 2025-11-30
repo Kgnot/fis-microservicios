@@ -35,7 +35,11 @@ public class ValidateController {
             return ResponseEntity.ok(
                     ApiResponse.success(
                             "Usuario verificado",
-                            new TokenResponse(user.id(), user.idRol())));
+                            new TokenResponse(
+                                    user.id(),
+                                    user.idRol(),
+                                    user.rolName(),
+                                    user.email())));
 
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(404)

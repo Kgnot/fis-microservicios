@@ -4,6 +4,7 @@ import uni.fis.usuario.dto.UserDto;
 import uni.fis.usuario.dto.request.UserRequest;
 import uni.fis.usuario.dto.response.UserResponse;
 import uni.fis.usuario.entity.DocumentoEntity;
+import uni.fis.usuario.entity.RolEntity;
 import uni.fis.usuario.entity.UsuarioEntity;
 
 import java.time.LocalDateTime;
@@ -11,12 +12,15 @@ import java.time.LocalDateTime;
 public class UserMapper {
 
     public static UserDto entityToDto(UsuarioEntity entity) {
+        var rol = entity.getRol();
         return new UserDto(
                 entity.getId(),
                 entity.getNombre(),
                 entity.getApellido_1(),
                 entity.getApellido_2(),
-                entity.getIdRol());
+                entity.getEmail(),
+                rol.getId(),
+                rol.getNombre());
     }
 
     public static UsuarioEntity dtoToEntity(UserDto userDto) {
@@ -29,7 +33,7 @@ public class UserMapper {
                 null, // idDocumento
                 null, // email
                 null, // strikes
-                userDto.idRol(), // idRol
+                new RolEntity(userDto.idRol(), userDto.rolName()),
                 null // imgPerfil
         );
     }
@@ -41,7 +45,9 @@ public class UserMapper {
                 userDto.apellido_1());
     }
 
-    public static UsuarioEntity requestToEntity(UserRequest userRequest, DocumentoEntity documentoEntity) {
+    public static UsuarioEntity requestToEntity(UserRequest userRequest,
+                                                DocumentoEntity documentoEntity,
+                                                RolEntity rol) {
         return new UsuarioEntity(
                 null,
                 userRequest.name(),
@@ -51,7 +57,7 @@ public class UserMapper {
                 documentoEntity,
                 userRequest.email(),
                 userRequest.strikes() != null ? userRequest.strikes() : 0,
-                userRequest.idRol(),
+                rol,
                 userRequest.imgPerfil());
     }
 

@@ -1,15 +1,16 @@
 package uni.fis.usuario.service;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uni.fis.usuario.dto.UserDto;
 import uni.fis.usuario.dto.request.UserRequest;
 import uni.fis.usuario.entity.DocumentoEntity;
 import uni.fis.usuario.entity.PasswordEntity;
+import uni.fis.usuario.entity.RolEntity;
 import uni.fis.usuario.entity.UsuarioEntity;
 import uni.fis.usuario.error.InvalidUserDataException;
 import uni.fis.usuario.error.UserAlreadyExistsException;
@@ -18,6 +19,7 @@ import uni.fis.usuario.mapper.DocumentoMapper;
 import uni.fis.usuario.mapper.UserMapper;
 import uni.fis.usuario.repository.DocumentoRepository;
 import uni.fis.usuario.repository.PasswordRepository;
+import uni.fis.usuario.repository.RolRepository;
 import uni.fis.usuario.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -30,17 +32,18 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordRepository passwordRepository;
-    private final EntityManager entityManager;
     private final DocumentoRepository documentoRepository;
+    private final RolRepository rolRepository;
 
     public UserServiceImpl(UserRepository userRepository,
-            PasswordRepository passwordRepository,
-            EntityManager entityManager,
-            DocumentoRepository documentoRepository) {
+                           PasswordRepository passwordRepository,
+                           EntityManager entityManager,
+                           DocumentoRepository documentoRepository,
+                           RolRepository rolRepository) {
         this.userRepository = userRepository;
         this.passwordRepository = passwordRepository;
-        this.entityManager = entityManager;
         this.documentoRepository = documentoRepository;
+        this.rolRepository = rolRepository;
     }
 
     @Override
@@ -59,56 +62,52 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto save(UserRequest user) {
-        // Validar campos requeridos primero
+
+        //Validación logica previa
         validateRequiredFields(user);
 
-        // Verificar email único
+        // Email único hmm
         if (userRepository.existsByEmail(user.email())) {
-            log.info("Email ya existe: {}", user.email());
             throw UserAlreadyExistsException.byEmail(user.email());
         }
 
         try {
-            // creamos primero el documento
+            // Creamos el documento
             DocumentoEntity documento = DocumentoMapper.toEntityForCreate(user.documento());
-            documento = documentoRepository.save(documento); // ← AQUÍ se genera el ID correcto
+            documento = documentoRepository.save(documento);
 
-            UsuarioEntity entity = UserMapper.requestToEntity(user, documento);
-            var userCreated = userRepository.save(entity);
+            // Obtener rol
+            RolEntity rol = rolRepository.findById(user.idRol())
+                    .orElseThrow(() -> new InvalidUserDataException("Rol no encontrado"));
 
-            PasswordEntity entityPassword = new PasswordEntity(
-                    null,
-                    LocalDateTime.now(),
-                    user.password(), // Aquí deberías encriptar la contraseña
-                    userCreated.getId());
-            passwordRepository.save(entityPassword);
-            return UserMapper.entityToDto(entity);
+            // Crear usuario
+            UsuarioEntity entity = UserMapper.requestToEntity(user, documento, rol);
+            UsuarioEntity userCreated = userRepository.save(entity);
 
-        } catch (DataIntegrityViolationException e) {
-            // Manejar violación de integridad (documento único, etc.)
-            if (e.getMessage().contains("documento")) {
-                throw UserAlreadyExistsException.byDocument(user.documento().numeroDocumento());
-            }
-
-            // Resetear secuencia si hay conflicto de ID
-            resetSequence();
-            DocumentoEntity documento = DocumentoMapper.toEntityForCreate(user.documento());
-            documento = documentoRepository.save(documento); // ← AQUÍ se genera el ID correcto
-
-            // Reintentar
-            UsuarioEntity entity = UserMapper.requestToEntity(user, documento);
-            var userCreated = userRepository.save(entity);
-
-            PasswordEntity entityPassword = new PasswordEntity(
+            PasswordEntity password = new PasswordEntity(
                     null,
                     LocalDateTime.now(),
                     user.password(),
-                    userCreated.getId());
-            passwordRepository.save(entityPassword);
-            return UserMapper.entityToDto(entity);
+                    userCreated.getId()
+            );
+            passwordRepository.save(password);
+
+            // 7. Retornar DTO del usuario creado
+            return UserMapper.entityToDto(userCreated);
+
+        } catch (DataIntegrityViolationException e) {
+
+            // Documento duplicado
+            if (e.getMessage() != null && e.getMessage().contains("documento")) {
+                throw UserAlreadyExistsException.byDocument(user.documento().numeroDocumento());
+            }
+
+            throw new InvalidUserDataException("Error de integridad: " + e.getMessage());
         }
     }
+
 
     @Override
     public Optional<UserDto> findByEmail(String email) {
@@ -147,13 +146,4 @@ public class UserServiceImpl implements UserService {
         return email != null && email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
     }
 
-    private void resetSequence() {
-        try {
-            Query query = entityManager.createNativeQuery(
-                    "SELECT setval('usuario_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM usuario))");
-            query.getSingleResult();
-        } catch (Exception e) {
-            throw new RuntimeException("Error al resetear secuencia: " + e.getMessage());
-        }
-    }
 }
