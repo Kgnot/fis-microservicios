@@ -3,6 +3,7 @@ package uni.fis.usuario.mapper;
 import uni.fis.usuario.dto.UserDto;
 import uni.fis.usuario.dto.request.UserRequest;
 import uni.fis.usuario.dto.response.UserResponse;
+import uni.fis.usuario.entity.DocumentoEntity;
 import uni.fis.usuario.entity.UsuarioEntity;
 
 import java.time.LocalDateTime;
@@ -15,8 +16,7 @@ public class UserMapper {
                 entity.getNombre(),
                 entity.getApellido_1(),
                 entity.getApellido_2(),
-                entity.getIdRol()
-        );
+                entity.getIdRol());
     }
 
     public static UsuarioEntity dtoToEntity(UserDto userDto) {
@@ -25,7 +25,7 @@ public class UserMapper {
                 userDto.nombre(),
                 userDto.apellido_1(),
                 userDto.apellido_2(),
-                null,//fecha de nacimiento
+                null, // fecha de nacimiento
                 null, // idDocumento
                 null, // email
                 null, // strikes
@@ -38,24 +38,21 @@ public class UserMapper {
         return new UserResponse(
                 userDto.id(),
                 userDto.nombre(),
-                userDto.apellido_1()
-        );
+                userDto.apellido_1());
     }
 
-    public static UsuarioEntity requestToEntity(UserRequest userRequest) {
-
+    public static UsuarioEntity requestToEntity(UserRequest userRequest, DocumentoEntity documentoEntity) {
         return new UsuarioEntity(
-                null, // id - se genera automáticamente
+                null,
                 userRequest.name(),
                 userRequest.apellido1(),
                 userRequest.apellido2(),
                 parseFechaNacimiento(userRequest.fechaNacimiento()),
-                DocumentoMapper.toEntity(userRequest.documento()),
+                documentoEntity,
                 userRequest.email(),
-                userRequest.strikes() != null ? userRequest.strikes() : 0, // default 0
+                userRequest.strikes() != null ? userRequest.strikes() : 0,
                 userRequest.idRol(),
-                userRequest.imgPerfil()
-        );
+                userRequest.imgPerfil());
     }
 
     // helper para parsear la fecha

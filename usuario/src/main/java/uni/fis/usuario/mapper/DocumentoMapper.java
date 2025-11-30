@@ -2,17 +2,16 @@ package uni.fis.usuario.mapper;
 
 import uni.fis.usuario.dto.request.DocumentoRequest;
 import uni.fis.usuario.entity.DocumentoEntity;
+import uni.fis.usuario.entity.TipoDocumentoEntity;
 
 public class DocumentoMapper {
 
-    public static DocumentoEntity toEntity(DocumentoRequest request) {
-
+    public static DocumentoEntity toEntityForCreate(DocumentoRequest request) {
         return new DocumentoEntity(
-                request.idDocumento(),
-                TipoDocumentoMapper.toEntity(request),
+                null, // null para crear
+                new TipoDocumentoEntity(request.idTipoDocumento(), null),
                 request.numeroDocumento(),
-                request.fechaExpiracion()
-        );
+                request.fechaExpiracion());
     }
 
 }

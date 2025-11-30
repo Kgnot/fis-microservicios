@@ -15,6 +15,7 @@ public class DocumentoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_documento", nullable = false)
     private Integer id;
 
     @ManyToOne
