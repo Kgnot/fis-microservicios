@@ -32,6 +32,7 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
     public Integer crearOrdenCompra(OrdenCompraRequest ordenCompraRequest){
         OrdenCompra ordenCompra = OrdenCompra.builder()
                                     .fecha(new Date())
+                                    .monto_total(ordenCompraRequest.getMonto_total())
                                     .idPago(ordenCompraRequest.getId_pago())
                                 .build();
         log.info("Procesando la información de la orden de compra");
@@ -56,6 +57,7 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
         OrdenCompraResponse response = OrdenCompraResponse.builder()
                                         .id(ordenCompra.getId())
                                         .fecha(ordenCompra.getFecha())
+                                        .monto_total(ordenCompra.getMonto_total())
                                         .id_pago(ordenCompra.getIdPago())
                                     .build();   
         log.info("Orden de compra encontrada exitosamente!");                 
@@ -82,14 +84,5 @@ public class OrdenCompraServiceImp implements OrdenCompraService{
         }
         log.info("Items encontrados exitosamente!");
         return response;
-    }
-    @Override
-    public BigDecimal calcularMontoTotal(Integer idOrdenCompra){
-        List<OrdenItemResponse> items = consultarOrdenesItems(idOrdenCompra);
-        BigDecimal montoTotal = new BigDecimal(0);
-        for (OrdenItemResponse item : items){
-            montoTotal = montoTotal.add(item.getSubtotal());
-        }
-        return montoTotal;
     }
 }

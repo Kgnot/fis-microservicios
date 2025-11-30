@@ -1,6 +1,5 @@
 package uni.fis.pago.Service.Interfaces;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import uni.fis.pago.Model.OrdenCompraDTO.OrdenCompraRequest;
@@ -12,5 +11,4 @@ public interface OrdenCompraService {
     void eliminarOrdenCompra(Integer idOrdenCompra);
     OrdenCompraResponse consultarOrdenCompra(Integer idOrdenCompra);
     List<OrdenItemResponse> consultarOrdenesItems(Integer idOrdenCompra);
-    BigDecimal calcularMontoTotal(Integer idOrdenCompra);
 }
