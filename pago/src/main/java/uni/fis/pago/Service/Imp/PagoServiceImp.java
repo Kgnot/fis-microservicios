@@ -24,7 +24,6 @@ public class PagoServiceImp implements PagoService{
 
         Pago pago = Pago.builder()
                     .fecha(pagoRequest.getFecha())
-                    .monto_total(pagoRequest.getMonto_total())
                     .idUsuario(pagoRequest.getId_usuario())
                     .idMetodoPago(pagoRequest.getId_metodo_pago())
                     .build();
@@ -39,7 +38,6 @@ public class PagoServiceImp implements PagoService{
         PagoResponse response = PagoResponse.builder()
                                 .id(pago.getId())
                                 .fecha(pago.getFecha())
-                                .monto_total(pago.getMonto_total())
                                 .id_usuario(pago.getIdUsuario())
                                 .id_metodo_pago(pago.getIdMetodoPago())
                                 .build();
