@@ -1,6 +1,5 @@
 package uni.fis.pago.Model.PagoDTO;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -16,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class PagoResponse {
     private Integer id;
     private Date fecha;
-    private BigDecimal monto_total;
     private Integer id_usuario;
     private Integer id_metodo_pago;
 }
