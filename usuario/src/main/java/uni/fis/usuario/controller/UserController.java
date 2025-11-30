@@ -47,12 +47,15 @@ public class UserController {
         }
 
         @GetMapping("/me")
-        public Map<String, Object> me(@AuthenticationPrincipal Claims claims) {
+        public ResponseEntity<ApiResponse<Map<String, Object>>> me(@AuthenticationPrincipal Claims claims) {
 
-                return Map.of(
-                                "user_id", claims.get("sub"),
-                                "email", claims.get("email"),
-                                "rol", claims.get("rol"));
+                return ResponseEntity.ok(
+                                ApiResponse.success(
+                                                "Usuario encontrado",
+                                                Map.of(
+                                                                "user_id", claims.get("sub"),
+                                                                "email", claims.get("email"),
+                                                                "rol", claims.get("rol"))));
         }
 
 }
