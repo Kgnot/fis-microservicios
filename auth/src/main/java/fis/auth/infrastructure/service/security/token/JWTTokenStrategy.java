@@ -39,7 +39,7 @@ public class JWTTokenStrategy implements TokenStrategy {
     @Override
     public Token generate(TokenRequest tokenRequest) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", tokenRequest.roles());
+        claims.put("rol", tokenRequest.rol());
         claims.put("email", tokenRequest.email());
 
         String accessToken = generateToken(claims, tokenRequest.userId(), jwtExpiration); // Usaremos el id que es único
