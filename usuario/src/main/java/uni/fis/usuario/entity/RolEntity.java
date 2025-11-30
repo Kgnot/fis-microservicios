@@ -3,6 +3,7 @@ package uni.fis.usuario.entity;
 
 //No me gysta mucho hacerlo pero toca salir rapido de esto y no pensar otro microservicio para arquitectura, etc
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,12 +27,12 @@ public class RolEntity {
     private String nombre;
 
     // Aqui vamos a mapearlo con el usuario:
-    @OneToMany(mappedBy = "rol")
-    @JsonManagedReference
-    private List<UsuarioEntity> entity;
+//    @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
+//    @JsonIgnore
+//    private List<UsuarioEntity> usuarios;
 
-    public RolEntity(Integer id, String nombre) {
-        this.id = id;
-        this.nombre = nombre;
-    }
+//    public RolEntity(Integer id, String nombre) {
+//        this.id = id;
+//        this.nombre = nombre;
+//    }
 }

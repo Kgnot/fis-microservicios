@@ -50,9 +50,9 @@ public class UserController {
         public Map<String, Object> me(@AuthenticationPrincipal Claims claims) {
 
                 return Map.of(
-                                "user_id", claims.get("user_id"),
+                                "user_id", claims.get("sub"),
                                 "email", claims.get("email"),
-                                "roles", claims.get("roles"));
+                                "rol", claims.get("rol"));
         }
 
 }

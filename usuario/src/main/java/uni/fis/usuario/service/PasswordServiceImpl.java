@@ -30,6 +30,7 @@ public class PasswordServiceImpl implements PasswordService {
     @Override
     public boolean validate(String email, String password) {
         // Buscamos el usuario
+        log.info("Entramos a validate -- y vamos a buscar por email");
         var usuario = userRepository.findByEmail(email);
         log.info("Usuario encontrado: " + usuario);
         if (usuario.isEmpty()) {
