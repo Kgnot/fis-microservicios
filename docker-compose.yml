@@ -88,6 +88,23 @@ services:
       retries: 3
       start_period: 30s
 
+  multimedia:
+    <<: *service-defaults
+    build: ./multimedia
+    container_name: fis-multimedia
+    environment:
+      SERVER_PORT: 8095
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8095/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
   # ---------------------
   #     NGINX — EL ÚNICO expuesto
   # ---------------------
@@ -107,6 +124,24 @@ services:
         condition: service_healthy
       vehiculo:
         condition: service_healthy
+      multimedia:
+        condition: service_healthy
+    networks:
+      - fis-network
+
+  # ------------
+  # Apartado de multimedia:
+  #------------
+
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    volumes:
+      - ./clamav/freshclam.conf:/etc/clamav/freshclam.conf:ro
+      - clamav-data:/var/lib/clamav
+    expose:
+      - "3310"
+    restart: always
     networks:
       - fis-network
 
@@ -169,3 +204,8 @@ services:
       - loki
     networks:
       - fis-network
+
+# volumes:
+
+volumes:
+  clamav-data:
