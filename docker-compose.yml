@@ -93,13 +93,13 @@ services:
     build: ./contenido
     container_name: fis-contenido
     environment:
-      SERVER_PORT: 8095
+      SERVER_PORT: 8082
       DATABASE_URL: ${DATABASE_URL}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       SECRET_KEY: ${SECRET_KEY}
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://localhost:8095/actuator/health" ]
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8082/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
