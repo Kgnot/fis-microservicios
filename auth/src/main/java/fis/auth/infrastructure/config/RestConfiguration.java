@@ -1,6 +1,5 @@
 package fis.auth.infrastructure.config;
 
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +14,18 @@ public class RestConfiguration {
     @Bean
     @Qualifier("user-ms")
     public RestTemplate getRestTemplateUserMs(RestTemplateBuilder builder) {
-        String baseUrl = "";
+        String baseUrl = "http://fis-usuario:8093";
+        return builder
+                .rootUri(baseUrl)
+                .connectTimeout(Duration.ofSeconds(10))
+                .readTimeout(Duration.ofSeconds(30))
+                .build();
+    }
+
+    @Bean
+    @Qualifier("email-ms")
+    public RestTemplate getRestTemplateEmailMs(RestTemplateBuilder builder) {
+        String baseUrl = "http://fis-email:8083";
         return builder
                 .rootUri(baseUrl)
                 .connectTimeout(Duration.ofSeconds(10))
