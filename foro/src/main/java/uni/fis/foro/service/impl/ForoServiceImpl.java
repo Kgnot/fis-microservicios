@@ -3,6 +3,7 @@ package uni.fis.foro.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uni.fis.foro.entity.ForoEntity;
+import uni.fis.foro.exception.ForoCategoriaNoValidaException;
 import uni.fis.foro.repository.ForoRepository;
 import uni.fis.foro.service.ForoService;
 
@@ -21,7 +22,7 @@ public class ForoServiceImpl implements ForoService {
 
     @Override
     public ForoEntity crearForo(String nombre) {
-        ForoEntity foro = new ForoEntity();   
+        ForoEntity foro = new ForoEntity();
         foro.setNombre(nombre);
         return foroRepository.save(foro);
     }
@@ -33,9 +34,14 @@ public class ForoServiceImpl implements ForoService {
 
     @Override
     public List<ForoEntity> filtrarForos(String nombre) {
+
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new ForoCategoriaNoValidaException("El nombre de búsqueda no puede estar vacío");
+        }
+
         return foroRepository.findAll().stream()
                 .filter(f -> f.getNombre() != null &&
-                             f.getNombre().toLowerCase().contains(nombre.toLowerCase()))
+                        f.getNombre().toLowerCase().contains(nombre.toLowerCase()))
                 .toList();
     }
 }

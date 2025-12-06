@@ -7,6 +7,8 @@ import uni.fis.foro.dto.AsignarCategoriaForoDTO;
 import uni.fis.foro.entity.CategoriaEntity;
 import uni.fis.foro.entity.ForoCategoriaEntity;
 import uni.fis.foro.entity.ForoEntity;
+import uni.fis.foro.exception.CategoriaNoEncontradaException;
+import uni.fis.foro.exception.ForoNoEncontradoException;
 import uni.fis.foro.repository.CategoriaRepository;
 import uni.fis.foro.repository.ForoCategoriaRepository;
 import uni.fis.foro.repository.ForoRepository;
@@ -33,8 +35,11 @@ class ForoCategoriaServiceImpl implements ForoCategoriaService {
     @Override
     public ForoCategoriaEntity asignarCategoria(AsignarCategoriaForoDTO dto) {
 
-        ForoEntity foro = foroRepository.findById(dto.getIdForo().intValue()).orElseThrow();
-        CategoriaEntity categoria = categoriaRepository.findById(dto.getIdCategoria().intValue()).orElseThrow();
+        ForoEntity foro = foroRepository.findById(dto.getIdForo())
+                .orElseThrow(() -> new ForoNoEncontradoException("Foro no encontrado"));
+
+        CategoriaEntity categoria = categoriaRepository.findById(dto.getIdCategoria())
+                .orElseThrow(() -> new CategoriaNoEncontradaException("Categoría no encontrada"));
 
         ForoCategoriaEntity fc = new ForoCategoriaEntity();
         fc.setForo(foro);
@@ -45,7 +50,10 @@ class ForoCategoriaServiceImpl implements ForoCategoriaService {
 
     @Override
     public List<ForoCategoriaEntity> listarPorCategoria(Integer idCategoria) {
-        CategoriaEntity categoria = categoriaRepository.findById(idCategoria).orElseThrow();
+
+        CategoriaEntity categoria = categoriaRepository.findById(idCategoria)
+                .orElseThrow(() -> new CategoriaNoEncontradaException("Categoría no encontrada"));
+
         return foroCategoriaRepository.findByCategoria(categoria);
     }
 }

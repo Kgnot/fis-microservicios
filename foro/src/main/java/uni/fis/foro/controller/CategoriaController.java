@@ -1,5 +1,6 @@
 package uni.fis.foro.controller;
 
+import uni.fis.foro.dto.ApiResponse;
 import uni.fis.foro.entity.CategoriaEntity;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,23 @@ public class CategoriaController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaEntity> crearCategoria(@RequestBody CategoriaEntity dto) {
-        return ResponseEntity.ok(categoriaService.crearCategoria(dto.getNombre()));
+    public ResponseEntity<ApiResponse<CategoriaEntity>> crearCategoria(@RequestBody CategoriaEntity dto) {
+
+        CategoriaEntity creada = categoriaService.crearCategoria(dto.getNombre());
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Categoría creada correctamente", creada)
+        );
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoriaEntity>> listar() {
-        return ResponseEntity.ok(categoriaService.listarCategorias());
+    public ResponseEntity<ApiResponse<List<CategoriaEntity>>> listar() {
+
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                "Listado de categorías obtenido correctamente",
+                categoriaService.listarCategorias()
+            )
+        );
     }
 }

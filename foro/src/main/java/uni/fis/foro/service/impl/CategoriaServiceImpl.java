@@ -30,3 +30,4 @@ class CategoriaServiceImpl implements CategoriaService {
         return categoriaRepository.findAll();
     }
 }
+

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import uni.fis.foro.dto.ApiResponse;
 import uni.fis.foro.dto.AsignarCategoriaForoDTO;
 import uni.fis.foro.entity.ForoCategoriaEntity;
 import uni.fis.foro.service.ForoCategoriaService;
@@ -25,12 +27,24 @@ public class ForoCategoriaController {
     }
 
     @PostMapping
-    public ResponseEntity<ForoCategoriaEntity> asignar(@RequestBody AsignarCategoriaForoDTO dto) {
-        return ResponseEntity.ok(foroCategoriaService.asignarCategoria(dto));
+    public ResponseEntity<ApiResponse<ForoCategoriaEntity>> asignar(@RequestBody AsignarCategoriaForoDTO dto) {
+
+        ForoCategoriaEntity asignada = foroCategoriaService.asignarCategoria(dto);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Categoría asignada correctamente al foro", asignada)
+        );
     }
 
     @GetMapping("/categoria/{idCategoria}")
-    public ResponseEntity<List<ForoCategoriaEntity>> listarPorCategoria(@PathVariable Integer idCategoria) {
-        return ResponseEntity.ok(foroCategoriaService.listarPorCategoria(idCategoria));
+    public ResponseEntity<ApiResponse<List<ForoCategoriaEntity>>> listarPorCategoria(
+            @PathVariable Integer idCategoria
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Foros obtenidos por categoría",
+                        foroCategoriaService.listarPorCategoria(idCategoria)
+                )
+        );
     }
 }
