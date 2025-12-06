@@ -12,19 +12,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PuntoInteresDTO {
 
-    private Long id;
+    private Integer id;
+
     private String nombre;
+
     private String descripcion;
-    private Double latitud;
-    private Double longitud;
-    private String tipo;
-    private String categoria;
-    private String direccion;
-    private String telefono;
-    private String sitioWeb;
-    private String imagenUrl;
-    private Double calificacionPromedio;
-    private Integer totalCalificaciones;
-    private Double distancia;
-    private Boolean activo;
+
+    private String imgPun;
+
+    private Integer idDireccion;
+
+    // Objeto anidado para la dirección completa (opcional)
+    private DireccionDTO direccion;
+
+    // Campo calculado para mostrar la dirección como string
+    private String direccionCompleta;
 }

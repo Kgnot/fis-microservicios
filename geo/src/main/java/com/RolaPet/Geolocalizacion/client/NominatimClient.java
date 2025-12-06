@@ -55,7 +55,7 @@ public class NominatimClient {
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         try {
-            URI uri = builder.build().encode().toUri();
+            URI uri = builder.build().encode().toUri();   // ✅ Codifica correctamente
             log.info("URL generada: {}", uri);
 
             ResponseEntity<NominatimResponse[]> response = restTemplate.exchange(
@@ -92,7 +92,7 @@ public class NominatimClient {
                 .queryParam("lon", lon)
                 .queryParam("format", "json")
                 .queryParam("addressdetails", "1")
-                .build(true)
+                .build(true)  // ❗ EVITA DOBLE ENCODE
                 .toUriString();
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
