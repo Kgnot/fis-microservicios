@@ -10,4 +10,5 @@ public interface PuntoInteresRepository extends JpaRepository<PuntoInteres, Inte
     List<PuntoInteres> findByDescripcionContainingIgnoreCase(String descripcion);
     List<PuntoInteres> findByIdDireccionIsNotNull();
     List<PuntoInteres> findByIdDireccion(Integer idDireccion);
+    List<PuntoInteres> findByIdDireccion(String direccionCompleta);
 }

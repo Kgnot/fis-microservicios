@@ -55,7 +55,7 @@ public class NominatimClient {
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         try {
-            URI uri = builder.build().encode().toUri();   // ✅ Codifica correctamente
+            URI uri = builder.build().encode().toUri();
             log.info("URL generada: {}", uri);
 
             ResponseEntity<NominatimResponse[]> response = restTemplate.exchange(

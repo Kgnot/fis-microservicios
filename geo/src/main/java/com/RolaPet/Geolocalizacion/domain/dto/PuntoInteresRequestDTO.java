@@ -47,5 +47,8 @@ public class PuntoInteresRequestDTO {
      */
     @NotNull(message = "La dirección es obligatoria")
     private DireccionDTO direccion;
+
+    private String DireccionCompleta;
+
 }
 

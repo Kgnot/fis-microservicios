@@ -82,7 +82,7 @@ public class GeolocalizacionService {
     }
 
     public PuntoInteresDTO registrarPuntoInteres(PuntoInteresRequestDTO request) {
-        log.info("➕ Registrando punto de interés: {}", request.getNombre());
+        log.info(" Registrando punto de interés: {}", request.getNombre());
 
         Direccion direccion = crearOBuscarDireccion(request.getDireccion());
 
@@ -90,7 +90,7 @@ public class GeolocalizacionService {
                 .nombre(request.getNombre())
                 .descripcion(request.getDescripcion())
                 .imgPun(request.getImgPun())
-                .idDireccion(direccion.getId())
+                .idDireccion(direccion.getId()).direccionCompleta(request.getDireccionCompleta())
                 .build();
 
         PuntoInteres guardado = puntoInteresRepository.save(punto);

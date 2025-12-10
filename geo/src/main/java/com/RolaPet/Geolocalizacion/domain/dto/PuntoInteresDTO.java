@@ -22,7 +22,9 @@ public class PuntoInteresDTO {
 
     private Integer idDireccion;
 
+    // Objeto anidado para la dirección completa (opcional)
     private DireccionDTO direccion;
 
+    // Campo calculado para mostrar la dirección como string
     private String direccionCompleta;
 }

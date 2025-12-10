@@ -34,4 +34,7 @@ public class PuntoInteres {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_direccion", insertable = false, updatable = false)
     private Direccion direccion;
+
+    @Column(name= "direccionCompleta")
+    private String direccionCompleta;
 }
