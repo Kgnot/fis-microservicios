@@ -115,6 +115,11 @@ public class UserServiceImpl implements UserService {
                 .map(UserMapper::entityToDto);
     }
 
+    @Override
+    public List<UsuarioEntity> findByUsuariosModerados() {
+        return userRepository.findByStrikesGreaterThan(1);
+    }
+
     private void validateRequiredFields(UserRequest request) {
         log.info("Validando campos requeridos {}", request);
         if (request.name() == null || request.name().trim().isEmpty()) {

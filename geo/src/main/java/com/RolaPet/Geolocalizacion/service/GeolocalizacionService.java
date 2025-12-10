@@ -69,8 +69,7 @@ public class GeolocalizacionService {
 
         NominatimResponse response = nominatimClient.reverse(
                 request.getLatitud(),
-                request.getLongitud()
-        );
+                request.getLongitud());
 
         DireccionDTO direccion = convertirNominatimADireccionDTO(response);
 
@@ -162,8 +161,7 @@ public class GeolocalizacionService {
                 dto.getNumeroVia(),
                 dto.getNumeroUno(),
                 dto.getNumeroDos(),
-                dto.getComplemento()
-        );
+                dto.getComplemento());
 
         if (existe) {
             log.warn("La dirección ya existe");
@@ -218,8 +216,7 @@ public class GeolocalizacionService {
                 dto.getViaPrincipal(),
                 dto.getNumeroVia(),
                 dto.getNumeroUno(),
-                dto.getNumeroDos()
-        );
+                dto.getNumeroDos());
 
         if (existente.isPresent()) {
             return existente.get();
@@ -278,8 +275,7 @@ public class GeolocalizacionService {
         return String.join("_",
                 Arrays.stream(params)
                         .map(String::valueOf)
-                        .toArray(String[]::new)
-        );
+                        .toArray(String[]::new));
     }
 
     private DireccionDTO convertirNominatimADireccionDTO(NominatimResponse response) {
@@ -316,13 +312,13 @@ public class GeolocalizacionService {
                 .descripcion(punto.getDescripcion())
                 .imgPun(punto.getImgPun())
                 .idDireccion(punto.getIdDireccion())
+                .direccionCompleta(punto.getDireccionCompleta())
                 .build();
 
         if (punto.getIdDireccion() != null) {
             direccionRepository.findById(punto.getIdDireccion()).ifPresent(direccion -> {
                 DireccionDTO direccionDTO = convertirADireccionDTO(direccion);
                 dto.setDireccion(direccionDTO);
-                dto.setDireccionCompleta(direccionDTO.getDireccionCompleta());
             });
         }
 
